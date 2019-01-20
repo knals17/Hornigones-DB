@@ -20,8 +20,16 @@
                 <div class="card p-2">
                     <form id="form2" class="m-1">
                         <div class="input-group mb-3">
-                            <input onkeyup="onKeyUp(event)" id="txtBuscar" type="text" class="form-control" placeholder="Buscar"
+                            <!--
+                                <input onkeyup="onKeyUp(event)" id="txtBuscar" type="text" class="form-control" placeholder="Buscar"
                                 aria-label="Recipient's username" aria-describedby="button-addon2" autofocus>
+                            -->
+                            <div class="form-group">
+                                    <label for="exampleFormControlSelect1">Resistencia</label>
+                                    <select id="txtBuscar" type="text" class="form-control">
+                                        
+                                    </select>
+                                </div>
                             <div class="input-group-append">
                                 <button class="btn btn-info" id="button-addon2">Buscar</button>
                             </div>
@@ -30,6 +38,36 @@
                     <table class="table">
                         <thead>
                             <tr>
+                                <td class="p-1">
+                                    <div class="form-group">
+                                        <label for="exampleFormControlSelect1">Desde</label>
+                                        <input id="fechainit" class="form-control form-control-sm" type="date">
+                                </td>
+                                <td class="p-1">
+                                    <div class="form-group">
+                                        <label for="exampleFormControlSelect1">Hasta</label>
+                                        <input id="fechaend" class="form-control form-control-sm"
+                                            type="date">
+                                </td>
+                                <td class="p-1">
+                                    <div class="form-group">
+                                        <label for="exampleFormControlSelect1">Resistencia</label>
+                                        <select id="resistenciavalue" class="form-control form-control-sm" id="exampleFormControlSelect1">
+                                            <option>-</option>
+                                            <option>180</option>
+                                            <option>210</option>
+                                            <option>250</option>
+                                            <option>280</option>
+                                            <option>300H</option>
+                                        </select>
+                                    </div>
+                                </td>
+                                <td class="p-1">
+                                    <h1>holaa</h1>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th scope="col" class="p-1">Fecha</th>
                                 <th scope="col" class="p-1">Clientes</th>
                                 <th scope="col" class="p-1">Direccion</th>
                                 <th scope="col" class="p-1">Ticket</th>
@@ -37,26 +75,34 @@
                                 <th scope="col" class="p-1">Volumen</th>
                                 <th scope="col" class="p-1">Unidad</th>
                             </tr>
-                            <tr>
-                                <td>
-                                    <div class="form-group">
-                                        <label for="exampleFormControlSelect1">Example select</label>
-                                        <select onchange="filtrado()" id="fltres" class="form-control" id="exampleFormControlSelect1">
-                                            <option>-</option>
-                                            <option>180</option>
-                                            <option>210</option>
-                                            <option>250</option>
-                                            <option>300H</option>
-                                        </select>
-                                    </div>
-                                </td>
-                            </tr>
                         </thead>
                         <tbody id="txt">
 
                         </tbody>
                     </table>
                 </div>
+                <nav aria-label="Page navigation example">
+                        <ul class="pagination">
+                          <li class="page-item">
+                            <a class="page-link" href="#" aria-label="Previous">
+                              <span aria-hidden="true">&laquo;</span>
+                            </a>
+                          </li>
+                          <div  id="paginas">
+
+                          </div>
+                          <li class="page-item"><a class="page-link" href="#">1</a></li>
+                          <li class="page-item"><a class="page-link" href="#">2</a></li>
+                          <li class="page-item"><a class="page-link" href="#">3</a></li>
+                          <li class="page-item">
+                            <a class="page-link" href="#" aria-label="Next">
+                              <span aria-hidden="true">&raquo;</span>
+                            </a>
+                          </li>
+                        </ul>
+                      </nav>
+
+
             </div>
             <div class="col-md-4">
                 <div class="card p-2">
@@ -66,6 +112,9 @@
 
                     <div class="m-2">
                         <form id="form" class="m-1">
+                            <div class="form-group">
+                                <input class="form-control" type="date" id="fecha">
+                            </div>
                             <div class="form-group">
                                 <input class="form-control" type="text" id="cliente" placeholder="Cliente">
                             </div>
@@ -107,7 +156,8 @@
                 const form2 = document.querySelector("#form2");
                 form2.addEventListener('submit', (e) => {
                     e.preventDefault();
-                    buscar();
+                    console.log('Ejecutado')
+                    filtrado();
                 });
 
                 function onKeyUp(event) {
@@ -121,25 +171,47 @@
 
                 //   const { ipcRenderer } = require('electron');
                 const txt = document.querySelector('#txt');
+                const txtBuscar = document.querySelector('#txtBuscar');
                 const { ipcRenderer } = require('electron');
 
                 ipcRenderer.on('carga', (e, datos) => {
-                    info = datos;
+                    //console.log(datos[0].fecha)
                     for (var i = 0; i < datos.length; i++) {
                         txt.innerHTML += `
                     <tr>
-                        <td>${datos[i].cliente}</td>
-                        <td>${datos[i].direccion}</td>
-                        <td>${datos[i].ticket}</td>
-                        <td>${datos[i].resistencia}</td>
-                        <td>${datos[i].volumen}</td>
-                        <td>${datos[i].unidad}</td>
-                        <td><button onclick="borrar(${datos[i].Id})" class="btn btn-danger btn-sm">Borrar</button></td>
+                        <td >${datos[i].fecha}</td>
+                        <td >${datos[i].cliente}</td>
+                        <td >${datos[i].direccion}</td>
+                        <td >${datos[i].ticket}</td>
+                        <td >${datos[i].resistencia}</td>
+                        <td >${datos[i].volumen}</td>
+                        <td >${datos[i].unidad}</td>
+                        
                     </tr>`;
                     }
-                    console.log(info)
                 });
 
+                ipcRenderer.on('carga2', (e, buscardata) => {
+                    //console.log(datos[0].fecha)
+                    txtBuscar.innerHTML += ``;
+                    for (var i = 0; i < buscardata.length; i++) {
+                        txtBuscar.innerHTML += `
+                        <option>${buscardata[i].cliente}</option>`;
+                    }
+
+                });
+
+                ipcRenderer.on('cuenta', (e, cuenta) => {
+                    console.log('Cuenta = ' + cuenta[0].registros)
+                    /*txtBuscar.innerHTML += ``;
+                    for (var i = 0; i < buscardata.length; i++) {
+                        txtBuscar.innerHTML += `
+                        <option>${buscardata[i].cliente}</option>`;
+                    }*/
+
+                });
+
+                
 
 
                 function borrar(id) {
@@ -149,6 +221,7 @@
 
                 function guardar() {
 
+                    const fecha = document.querySelector('#fecha').value;
                     const cliente = document.querySelector('#cliente').value;
                     const direccion = document.querySelector('#direccion').value;
                     const ticket = document.querySelector('#ticket').value;
@@ -158,6 +231,7 @@
 
 
                     const datos = {
+                        fecha: fecha,
                         cliente: cliente,
                         direccion: direccion,
                         ticket: ticket,
@@ -187,6 +261,7 @@
                             for (var i = 0; i < datos.length; i++) {
                                 txt.innerHTML += `
                     <tr>
+                        <td>${datos[i].fecha}</td>
                         <td>${datos[i].cliente}</td>
                         <td>${datos[i].direccion}</td>
                         <td>${datos[i].ticket}</td>
@@ -206,6 +281,7 @@
                                 console.log('Buscando DATOS');
                                 txt.innerHTML += `
                     <tr>
+                        <td>${datos[i].fecha}</td>
                         <td>${datos[i].cliente}</td>
                         <td>${datos[i].direccion}</td>
                         <td>${datos[i].ticket}</td>
@@ -220,62 +296,61 @@
                 }
 
                 function filtrado() {
+                    const consulta = document.querySelector('#txtBuscar').value;
+                    const resistenciavalue = document.querySelector('#resistenciavalue').value;
+                    let fechainit = document.querySelector('#fechainit').value
+                    let fechaend = document.querySelector('#fechaend').value
+                    let sql = "";
 
-                    const fltres = document.querySelector('#fltres').value;
-                    console.log(fltres);
+                    if (fechainit == ""){
+                        fechainit = '2000-01-01'
+                    }
+                    if (fechaend == ""){
+                        fechaend = '3000-01-01'
+                    }
 
-                    console.log('Recargando DATOS');
-                        ipcRenderer.send('buscar', consulta);
+                    sql = 'SELECT * FROM despachohs WHERE fecha BETWEEN "' + fechainit + '" AND "' + fechaend + '"';
 
-                        ipcRenderer.on('carga', (e, datos) => {
-                            
-                        }
+                    if (consulta != ""){
+                        sql += ' AND cliente = "' + consulta + '"';
+                    }
 
+                    if (resistenciavalue != "-"){
+                        sql += ' AND resistencia = "' + resistenciavalue + '"';
+                    }
+                    
 
+                    ipcRenderer.send('filtrar', sql);
 
-
-                    if (fltres == '-') {
-
-                        console.log('Recargando DATOS');
-                        ipcRenderer.send('buscar', consulta);
-
-                        ipcRenderer.on('carga', (e, datos) => {
-                            txt.innerHTML = '';
-                            for (var i = 0; i < datos.length; i++) {
-                                txt.innerHTML += `
+                    ipcRenderer.on('filtro', (e, datos) => {
+                        txt.innerHTML = '';
+                        console.log('Buscando DATOS');
+                        for (var i = 0; i < datos.length; i++) {
+                            txt.innerHTML += `
                     <tr>
+                        <td>${datos[i].fecha}</td>
                         <td>${datos[i].cliente}</td>
                         <td>${datos[i].direccion}</td>
                         <td>${datos[i].ticket}</td>
                         <td>${datos[i].resistencia}</td>
                         <td>${datos[i].volumen}</td>
                         <td>${datos[i].unidad}</td>
-                        <td><button onclick="borrar(${datos[i].Id})" class="btn btn-danger btn-sm">Borrar</button></td>
+                        <td><button onclick="borrar(${datos[i].Id})" class="btn btn-danger">Borrar</button></td>
                     </tr>`;
-                            }
-                        });
-                    } else {
-                        txt.innerHTML = '';
-                        for (var i = 0; i < info.length; i++) {
-                            console.log(info[i].resistencia)
-                            if (info[i].resistencia == fltres) {
-                                txt.innerHTML += `
-                    <tr>
-                        <td>${info[i].cliente}</td>
-                        <td>${info[i].direccion}</td>
-                        <td>${info[i].ticket}</td>
-                        <td>${info[i].resistencia}</td>
-                        <td>${info[i].volumen}</td>
-                        <td>${info[i].unidad}</td>
-                        <td><button onclick="borrar(${info[i].Id})" class="btn btn-danger btn-sm">Borrar</button></td>
-                    </tr>`;
-                            }
-
-                        }
-                    }
-
-
+                        };
+                    });
                 };
+
+                function muestra() {
+                    const dato = document.querySelector('#fecha1').value
+                    console.log(dato);
+                }
+
+
+
+
+
+
 
             </script>
 </body>
