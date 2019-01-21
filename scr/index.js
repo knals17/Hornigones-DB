@@ -25,7 +25,7 @@ conexion.connect((err) => {
     }
 });
 
-let query = 'SELECT * FROM despachohs LIMIT 10 ';
+let query = 'SELECT * FROM despachohs LIMIT 50 ';
 
 function enviarDatos() {
     let datos = [] 
@@ -40,7 +40,7 @@ function enviarDatos() {
 
         console.log('Despachos cargados!');
         console.log('*******************************');
-        console.log(datos);
+        console.log('Data Cargadas');
         console.log('-------------------------------');
     });
     query = 'SELECT DISTINCT cliente FROM electron_crud.despachohs ORDER BY cliente ASC';
@@ -55,7 +55,7 @@ function enviarDatos() {
 
         console.log('Clientes cargados!');
         console.log('*******************************');
-        console.log(clientes);
+        console.log('Clientes Cargadas');
         console.log('-------------------------------');
     });
 
@@ -179,6 +179,22 @@ ipcMain.on('filtrar', (e, sql) => {
         mainWindow.webContents.send('filtro', row);
     });
     //}
+});
+
+ipcMain.on('pagina', (e, num) => {
+        let query = 'SELECT * FROM despachohs LIMIT ' + num + ' , 50';
+        console.log('SQL = ' + query);
+        conexion.query(query,(err, row) => {
+            if (err) {
+                console.log('Hubo un error: ');
+                console.log(err);
+                return;
+            }
+            console.log('******************************');
+            console.log('Paginas Cargadas');
+            console.log('------------------------------');
+            mainWindow.webContents.send('paginacarga', row);
+        });
 });
 
 

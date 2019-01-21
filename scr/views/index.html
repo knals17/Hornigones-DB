@@ -25,11 +25,11 @@
                                 aria-label="Recipient's username" aria-describedby="button-addon2" autofocus>
                             -->
                             <div class="form-group">
-                                    <label for="exampleFormControlSelect1">Resistencia</label>
-                                    <select id="txtBuscar" type="text" class="form-control">
-                                        
-                                    </select>
-                                </div>
+                                <label for="exampleFormControlSelect1">Resistencia</label>
+                                <select id="txtBuscar" type="text" class="form-control">
+
+                                </select>
+                            </div>
                             <div class="input-group-append">
                                 <button class="btn btn-info" id="button-addon2">Buscar</button>
                             </div>
@@ -46,8 +46,7 @@
                                 <td class="p-1">
                                     <div class="form-group">
                                         <label for="exampleFormControlSelect1">Hasta</label>
-                                        <input id="fechaend" class="form-control form-control-sm"
-                                            type="date">
+                                        <input id="fechaend" class="form-control form-control-sm" type="date">
                                 </td>
                                 <td class="p-1">
                                     <div class="form-group">
@@ -82,25 +81,10 @@
                     </table>
                 </div>
                 <nav aria-label="Page navigation example">
-                        <ul class="pagination">
-                          <li class="page-item">
-                            <a class="page-link" href="#" aria-label="Previous">
-                              <span aria-hidden="true">&laquo;</span>
-                            </a>
-                          </li>
-                          <div  id="paginas">
-
-                          </div>
-                          <li class="page-item"><a class="page-link" href="#">1</a></li>
-                          <li class="page-item"><a class="page-link" href="#">2</a></li>
-                          <li class="page-item"><a class="page-link" href="#">3</a></li>
-                          <li class="page-item">
-                            <a class="page-link" href="#" aria-label="Next">
-                              <span aria-hidden="true">&raquo;</span>
-                            </a>
-                          </li>
-                        </ul>
-                      </nav>
+                    <ul class="pagination" id="paginas">
+                        
+                    </ul>
+                </nav>
 
 
             </div>
@@ -172,6 +156,7 @@
                 //   const { ipcRenderer } = require('electron');
                 const txt = document.querySelector('#txt');
                 const txtBuscar = document.querySelector('#txtBuscar');
+                const paginas = document.querySelector('#paginas');
                 const { ipcRenderer } = require('electron');
 
                 ipcRenderer.on('carga', (e, datos) => {
@@ -179,13 +164,13 @@
                     for (var i = 0; i < datos.length; i++) {
                         txt.innerHTML += `
                     <tr>
-                        <td >${datos[i].fecha}</td>
-                        <td >${datos[i].cliente}</td>
-                        <td >${datos[i].direccion}</td>
-                        <td >${datos[i].ticket}</td>
-                        <td >${datos[i].resistencia}</td>
-                        <td >${datos[i].volumen}</td>
-                        <td >${datos[i].unidad}</td>
+                        <td class="p-1">${datos[i].fecha}</td>
+                        <td class="p-1">${datos[i].cliente}</td>
+                        <td class="p-1">${datos[i].direccion}</td>
+                        <td class="p-1">${datos[i].ticket}</td>
+                        <td class="p-1">${datos[i].resistencia}</td>
+                        <td class="p-1">${datos[i].volumen}</td>
+                        <td class="p-1">${datos[i].unidad}</td>
                         
                     </tr>`;
                     }
@@ -203,15 +188,57 @@
 
                 ipcRenderer.on('cuenta', (e, cuenta) => {
                     console.log('Cuenta = ' + cuenta[0].registros)
-                    /*txtBuscar.innerHTML += ``;
-                    for (var i = 0; i < buscardata.length; i++) {
-                        txtBuscar.innerHTML += `
-                        <option>${buscardata[i].cliente}</option>`;
-                    }*/
+                    const paginacion = (cuenta[0].registros / 100) ;
+                    console.log(paginacion)
+                    paginas.innerHTML = `
+                    <li class="page-item">
+                            <a class="page-link" href="#" aria-label="Previous">
+                                <span aria-hidden="true">&laquo;</span>
+                            </a>
+                        </li>
+                    `;
+                    for (var i = 1; i < paginacion; i++) {
+                        paginas.innerHTML += `
+                        <li class="page-item"><a onclick ="pagina(${i})" class="page-link" href="#">${i}</a></li>`;
+                    }
+                    paginas.innerHTML += `
+                    <li class="page-item">
+                            <a class="page-link" href="#" aria-label="Next">
+                                <span aria-hidden="true">&raquo;</span>
+                            </a>
+                        </li>
+                    `;
 
                 });
 
+                function pagina(num){
+                    num = num * 50;
+
+                    ipcRenderer.send('pagina', num);
+
+                        ipcRenderer.on('paginacarga', (e, datos) => {
+                            txt.innerHTML = '';
+                            for (var i = 0; i < datos.length; i++) {
+                                txt.innerHTML += `
+                    <tr>
+                        <td class="p-1">${datos[i].fecha}</td>
+                        <td class="p-1">${datos[i].cliente}</td>
+                        <td class="p-1">${datos[i].direccion}</td>
+                        <td class="p-1">${datos[i].ticket}</td>
+                        <td class="p-1">${datos[i].resistencia}</td>
+                        <td class="p-1">${datos[i].volumen}</td>
+                        <td class="p-1">${datos[i].unidad}</td>
+                    </tr>`;
+                            }
+                        });
+
+                }
+
                 
+                        
+                        
+
+
 
 
                 function borrar(id) {
@@ -261,14 +288,13 @@
                             for (var i = 0; i < datos.length; i++) {
                                 txt.innerHTML += `
                     <tr>
-                        <td>${datos[i].fecha}</td>
-                        <td>${datos[i].cliente}</td>
-                        <td>${datos[i].direccion}</td>
-                        <td>${datos[i].ticket}</td>
-                        <td>${datos[i].resistencia}</td>
-                        <td>${datos[i].volumen}</td>
-                        <td>${datos[i].unidad}</td>
-                        <td><button onclick="borrar(${datos[i].Id})" class="btn btn-danger btn-sm">Borrar</button></td>
+                        <td class="p-1">${datos[i].fecha}</td>
+                        <td class="p-1">${datos[i].cliente}</td>
+                        <td class="p-1">${datos[i].direccion}</td>
+                        <td class="p-1">${datos[i].ticket}</td>
+                        <td class="p-1">${datos[i].resistencia}</td>
+                        <td class="p-1">${datos[i].volumen}</td>
+                        <td class="p-1">${datos[i].unidad}</td>
                     </tr>`;
                             }
                         });
@@ -281,14 +307,13 @@
                                 console.log('Buscando DATOS');
                                 txt.innerHTML += `
                     <tr>
-                        <td>${datos[i].fecha}</td>
-                        <td>${datos[i].cliente}</td>
-                        <td>${datos[i].direccion}</td>
-                        <td>${datos[i].ticket}</td>
-                        <td>${datos[i].resistencia}</td>
-                        <td>${datos[i].volumen}</td>
-                        <td>${datos[i].unidad}</td>
-                        <td><button onclick="borrar(${datos[i].Id})" class="btn btn-danger">Borrar</button></td>
+                        <td class="p-1">${datos[i].fecha}</td>
+                        <td class="p-1">${datos[i].cliente}</td>
+                        <td class="p-1">${datos[i].direccion}</td>
+                        <td class="p-1">${datos[i].ticket}</td>
+                        <td class="p-1">${datos[i].resistencia}</td>
+                        <td class="p-1">${datos[i].volumen}</td>
+                        <td class="p-1">${datos[i].unidad}</td>
                     </tr>`;
                             };
                         });
@@ -302,23 +327,23 @@
                     let fechaend = document.querySelector('#fechaend').value
                     let sql = "";
 
-                    if (fechainit == ""){
+                    if (fechainit == "") {
                         fechainit = '2000-01-01'
                     }
-                    if (fechaend == ""){
+                    if (fechaend == "") {
                         fechaend = '3000-01-01'
                     }
 
                     sql = 'SELECT * FROM despachohs WHERE fecha BETWEEN "' + fechainit + '" AND "' + fechaend + '"';
 
-                    if (consulta != ""){
+                    if (consulta != "") {
                         sql += ' AND cliente = "' + consulta + '"';
                     }
 
-                    if (resistenciavalue != "-"){
+                    if (resistenciavalue != "-") {
                         sql += ' AND resistencia = "' + resistenciavalue + '"';
                     }
-                    
+
 
                     ipcRenderer.send('filtrar', sql);
 
