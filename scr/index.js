@@ -58,21 +58,6 @@ function enviarDatos() {
         console.log('Clientes Cargadas');
         console.log('-------------------------------');
     });
-
-    conexion.query('SELECT COUNT(*) AS registros FROM despachohs', (err, row) => {
-        if (err) {
-            console.log('Hubo un error: ');
-            console.log(err);
-            return;
-        }
-        let datos = row;
-        mainWindow.webContents.send('cuenta', datos);
-    
-        console.log('Cuenta!');
-        console.log('*******************************');
-        console.log(datos[0]);
-        console.log('-------------------------------');
-    });
 };
 
 
@@ -162,12 +147,13 @@ ipcMain.on('buscar', (e, consulta) => {
     }
 });
 
-ipcMain.on('filtrar', (e, sql) => {
+ipcMain.on('filtrar', (e, sql, sqlCuenta) => {
     //console.log('Fechas = ' + consulta1 + ' ' + consulta2);
     //if (consulta == '') {
     //enviarDatos();
     //} else {
     //let query = 'SELECT * FROM despachohs WHERE fecha BETWEEN "' + consulta1 + '" AND "' + consulta2 + '"';
+    sql += ' LIMIT  0,  50;'
     console.log('SQL = ' + sql);
     conexion.query(sql, (err, row) => {
         if (err) {
@@ -179,10 +165,24 @@ ipcMain.on('filtrar', (e, sql) => {
         mainWindow.webContents.send('filtro', row);
     });
     //}
+    conexion.query(sqlCuenta, (err, row) => {
+        if (err) {
+            console.log('Hubo un error: ');
+            console.log(err);
+            return;
+        }
+        let datos = row;
+        mainWindow.webContents.send('cuenta', datos);
+    
+        console.log('Cuenta!');
+        console.log('*******************************');
+        console.log(datos[0]);
+        console.log('-------------------------------');
+    });
 });
 
-ipcMain.on('pagina', (e, num) => {
-        let query = 'SELECT * FROM despachohs LIMIT ' + num + ' , 50';
+ipcMain.on('pagina', (e, sql) => {
+        let query = sql;
         console.log('SQL = ' + query);
         conexion.query(query,(err, row) => {
             if (err) {
