@@ -14,21 +14,25 @@
 
 <body>
     <div class="container-fluid">
-            <ul class="nav bg-secondary mt-2">
-                    <li class="nav-item">
-                            <a href=""><button class="nav-link btn btn-primary">Dashboard</button></a>
-                          </li>
-                    <li class="nav-item">
-                      <a href=""><button class="nav-link btn btn-primary" href="index.html">Consulta Clientes</button></a>
-                    </li>
-                    <li class="nav-item">
-                            <a href=""><button class="nav-link btn btn-primary active" href="#">Consulta Proveedores</button></a>
-                        </li>
-                    <li class="nav-item">
-                      <a href=""><button class="nav-link btn btn-primary" href="#" tabindex="-1" aria-disabled="true">Disabled</button></a>
-                    </li>
-                  </ul>
-        <a href="#"><button class="btn btn-primary">Agregar</button></a>
+        <ul class="nav bg-secondary mt-2">
+            <li class="nav-item">
+                    <a href=""><button class="nav-link btn btn-primary">Dashboard</button></a>
+                  </li>
+            <li class="nav-item">
+              <a href="index.html"><button class="nav-link btn btn-primary ">Consulta Clientes</button></a>
+            </li>
+            <li class="nav-item">
+                    <a href="proveedores.html"><button class="nav-link btn btn-primary active">Consulta Proveedores</button></a>
+                </li>
+            <li class="nav-item">
+              <a href=""><button class="nav-link btn btn-primary" tabindex="-1" aria-disabled="true">Disabled</button></a>
+            </li>
+          </ul>
+          <div class="ml-3 mt-1">
+            <a href="proveedores.html"><button class="btn btn-primary active">Consulta General</button></a>
+            <a href="cuentasproveedores.html"><button class="btn btn-primary">Consulta</button></a>
+          </div>
+       
 
         <div class="row m-3">
             <div class="col">
@@ -41,20 +45,22 @@
                             -->
                         <div class="row">
                             <div class="col">
-                                <label for="exampleFormControlSelect1">Clientes</label>
+                                <label for="exampleFormControlSelect1">Proveedores</label>
                                 <select id="txtBuscar" type="text" class="form-control form-control-sm">
 
                                 </select>
                             </div>
                             <div class="col">
-                                <label for="exampleFormControlSelect1">Resistencia</label>
+                                <label for="exampleFormControlSelect1">Material</label>
                                 <select id="resistenciavalue" class="form-control form-control-sm" id="exampleFormControlSelect1">
                                     <option>-</option>
-                                    <option>180</option>
-                                    <option>210</option>
-                                    <option>250</option>
-                                    <option>280</option>
-                                    <option>300H</option>
+                                    <option>Granza</option>
+                                    <option>Piedra</option>
+                                    <option>Cemento</option>
+                                    <option>Agua</option>
+                                    <option>Aditivo</option>
+                                    <option>Fibra</option>
+                                    <option>Hidrofugo</option>
                                 </select>
                             </div>
                             <div class="col">
@@ -83,12 +89,12 @@
                             <thead>
                                 <tr>
                                     <th scope="col" class="p-1">Fecha</th>
-                                    <th scope="col" class="p-1">Clientes</th>
-                                    <th scope="col" class="p-1">Direccion</th>
-                                    <th scope="col" class="p-1">Ticket</th>
-                                    <th scope="col" class="p-1">Resistencia</th>
+                                    <th scope="col" class="p-1">Proveedor</th>
+                                    <th scope="col" class="p-1">Chofer</th>
+                                    <th scope="col" class="p-1">N. Control</th>
+                                    <th scope="col" class="p-1">Material</th>
                                     <th scope="col" class="p-1">Volumen</th>
-                                    <th scope="col" class="p-1">Unidad</th>
+                                    <th scope="col" class="p-1">Toneladas</th>
                                 </tr>
                             </thead>
                             <tbody id="txt">
@@ -106,6 +112,150 @@
 
             </div>
             <script>
+                const form2 = document.querySelector("#form2");
+                form2.addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    console.log('Ejecutado')
+                    filtrado();
+                });
+
+                const txt = document.querySelector('#txt');
+                const txtBuscar = document.querySelector('#txtBuscar');
+                const paginas = document.querySelector('#paginas');
+                const { ipcRenderer } = require('electron');
+
+                ipcRenderer.on('carga3', (e, buscardata) => {
+                    //console.log(datos[0].fecha)
+                    txtBuscar.innerHTML += ``;
+                    for (var i = 0; i < buscardata.length; i++) {
+                        txtBuscar.innerHTML += `
+                        <option>${buscardata[i].proveedor}</option>`;
+                    }
+
+                });
+
+
+                function filtrado() {
+                    const consulta = document.querySelector('#txtBuscar').value;
+                    const resistenciavalue = document.querySelector('#resistenciavalue').value;
+                    let fechainit = document.querySelector('#fechainit').value
+                    let fechaend = document.querySelector('#fechaend').value
+                    let sql = "";
+                    let sqlCuenta = "";
+
+                    if (fechainit == "") {
+                        fechainit = '2000-01-01'
+                    }
+                    if (fechaend == "") {
+                        fechaend = '3000-01-01'
+                    }
+
+                    sql = 'SELECT * FROM materiales WHERE fecha BETWEEN "' + fechainit + '" AND "' + fechaend + '"';
+                    sqlCuenta = 'SELECT COUNT(*) AS registros FROM materiales WHERE fecha BETWEEN "' + fechainit + '" AND "' + fechaend + '"';
+
+                    if (consulta != "") {
+                        sql += ' AND proveedor = "' + consulta + '"';
+                        sqlCuenta += ' AND proveedor = "' + consulta + '"';
+                    }
+
+                    if (resistenciavalue != "-") {
+                        sql += ' AND material = "' + resistenciavalue + '"';
+                        sqlCuenta += ' AND material = "' + resistenciavalue + '"';
+                    }
+
+
+
+                    ipcRenderer.send('filtrar', sql, sqlCuenta);
+
+                    ipcRenderer.on('filtro', (e, datos) => {
+                        txt.innerHTML = '';
+                        console.log('Buscando DATOS');
+                        for (var i = 0; i < datos.length; i++) {
+                            txt.innerHTML += `
+                    <tr>
+                        <td class="p-1">${datos[i].fecha}</td>
+                        <td class="p-1">${datos[i].proveedor}</td>
+                        <td class="p-1">${datos[i].chofer}</td>
+                        <td class="p-1">${datos[i].control}</td>
+                        <td class="p-1">${datos[i].material}</td>
+                        <td class="p-1">${datos[i].m3}</td>
+                        <td class="p-1">${datos[i].tn}</td>
+                    </tr>`;
+                        };
+                    });
+                    ipcRenderer.on('cuenta', (e, cuenta) => {
+                        console.log('Cuenta = ' + cuenta[0].registros)
+                        const paginacion = (cuenta[0].registros / 50);
+                        console.log(paginacion)
+                        paginas.innerHTML = `
+                    <li class="page-item">
+                            <a class="page-link" href="#" aria-label="Previous">
+                                <span aria-hidden="true">&laquo;</span>
+                            </a>
+                        </li>
+                    `;
+                        for (var i = 0; i < paginacion; i++) {
+                            paginas.innerHTML += `
+                        <li class="page-item"><a onclick ="pagina(${i})" class="page-link" href="#">${i}</a></li>`;
+                        }
+                        paginas.innerHTML += `
+                    <li class="page-item">
+                            <a class="page-link" href="#" aria-label="Next">
+                                <span aria-hidden="true">&raquo;</span>
+                            </a>
+                        </li>
+                    `;
+
+                    });
+                };
+
+                function pagina(num) {
+                    num = num  * 50;
+                    const consulta = document.querySelector('#txtBuscar').value;
+                    const resistenciavalue = document.querySelector('#resistenciavalue').value;
+                    let fechainit = document.querySelector('#fechainit').value
+                    let fechaend = document.querySelector('#fechaend').value
+                    let sql = "";
+
+                    if (fechainit == "") {
+                        fechainit = '2000-01-01'
+                    }
+                    if (fechaend == "") {
+                        fechaend = '3000-01-01'
+                    }
+
+                    sql = 'SELECT * FROM materiales WHERE fecha BETWEEN "' + fechainit + '" AND "' + fechaend + '"';
+
+                    if (consulta != "") {
+                        sql += ' AND proveedor = "' + consulta + '"';
+                    }
+
+                    if (resistenciavalue != "-") {
+                        sql += ' AND resistencia = "' + resistenciavalue + '"';
+                    }
+
+                    sql += ' LIMIT ' + num + ' , 50';
+
+
+                    ipcRenderer.send('pagina', sql);
+
+                    ipcRenderer.on('paginacarga', (e, datos) => {
+                        txt.innerHTML = '';
+                        for (var i = 0; i < datos.length; i++) {
+                            txt.innerHTML += `
+                    <tr>
+                            <td class="p-1">${datos[i].fecha}</td>
+                        <td class="p-1">${datos[i].proveedor}</td>
+                        <td class="p-1">${datos[i].chofer}</td>
+                        <td class="p-1">${datos[i].control}</td>
+                        <td class="p-1">${datos[i].material}</td>
+                        <td class="p-1">${datos[i].m3}</td>
+                        <td class="p-1">${datos[i].tn}</td>
+                    </tr>`;
+                        }
+                    });
+
+                }
 
             </script>
 </body>

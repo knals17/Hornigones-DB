@@ -58,6 +58,22 @@ function enviarDatos() {
         console.log('Clientes Cargadas');
         console.log('-------------------------------');
     });
+
+    query = 'SELECT DISTINCT proveedor FROM electron_crud.materiales ORDER BY proveedor ASC';
+    conexion.query(query, (err, row) => {
+        if (err) {
+            console.log('Hubo un error: ');
+            console.log(err);
+            return;
+        }
+        let proveedor = row;
+        mainWindow.webContents.send('carga3', proveedor);
+
+        console.log('Clientes cargados!');
+        console.log('*******************************');
+        console.log('Clientes Cargadas');
+        console.log('-------------------------------');
+    });
 };
 
 
