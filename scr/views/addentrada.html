@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+    <link rel="stylesheet" href="https://bootswatch.com/4/superhero/bootstrap.min.css" crossorigin="anonymous">
+
+    <title>Document</title>
+
+</head>
+
+<body>
+    <div class="container-fluid">
+        <ul class="nav bg-secondary mt-2">
+            <li class="nav-item">
+                <a href=""><button class="nav-link btn btn-primary">Dashboard</button></a>
+            </li>
+            <li class="nav-item">
+                <a href="index.html"><button class="nav-link btn btn-primary active">Consulta Clientes</button></a>
+            </li>
+            <li class="nav-item">
+                <a href="proveedores.html"><button class="nav-link btn btn-primary">Consulta Proveedores</button></a>
+            </li>
+            <li class="nav-item">
+                <a href=""><button class="nav-link btn btn-primary" tabindex="-1" aria-disabled="true">Disabled</button></a>
+            </li>
+        </ul>
+        <h2 class="text-center">Agregar Datos</h2>
+            <form id="form">
+                <div class="row">
+                <div class="col-6">
+                    <div class="form-group">
+                            <label for="exampleFormControlSelect1">Fecha</label>
+                        <input class="form-control" type="date" id="fecha">
+                    </div>
+                    <div class="form-group">
+                        <label for="exampleFormControlSelect1">Proveedor</label>
+                        <select id="txtBuscar" type="text" class="form-control form-control-sm">
+
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="exampleFormControlSelect1">Material</label>
+                        <select id="agregadoValue" class="form-control form-control-sm">
+                            <option>Granza</option>
+                            <option>Piedra</option>
+                            <option>Cemento</option>
+                            <option>Agua</option>
+                            <option>Aditivo</option>
+                            <option>Fibra</option>
+                            <option>Hidrofugo</option>
+                        </select>
+                    </div>
+
+                </div>
+                <div class="col-6">
+                    <div class="form-group">
+                        <label for="exampleFormControlSelect1">Chofer</label>
+                        <input class="form-control" type="text" id="chofer">
+                    </div>
+                    <div class="form-group">
+                        <label for="exampleFormControlSelect1">N. de Control</label>
+                        <input class="form-control" type="text" id="nControl">
+                    </div>
+                    <div class="form-group">
+                        <label for="exampleFormControlSelect1">Cantidad</label>
+                        <input class="form-control" type="text" id="Cantidad">
+                    </div>
+                </div>
+
+                <button class="btn btn-success btn-block mx-3">Guardar</button>
+            </div>
+            </form>
+
+
+    </div>
+</body>
+
+<script>
+    const { ipcRenderer } = require('electron');
+
+    const form = document.querySelector('#form');
+    form.addEventListener('submit', (e) => {
+        e.preventDefault();
+        guardar();
+    });
+
+    ipcRenderer.on('carga4', (e, buscardata) => {
+        //console.log(datos[0].fecha)
+        txtBuscar.innerHTML += ``;
+        for (var i = 0; i < buscardata.length; i++) {
+            txtBuscar.innerHTML += `
+                        <option>${buscardata[i].nombre}</option>`;
+        }
+
+    });
+
+
+    function guardar() {
+
+        const fecha = document.querySelector('#fecha').value;
+        const proveedor = document.querySelector('#txtBuscar').value;
+        const agregado = document.querySelector('#agregadoValue').value;
+        const chofer = document.querySelector('#chofer').value;
+        const nControl = document.querySelector('#nControl').value;
+        const cantidad = document.querySelector('#Cantidad').value;
+
+        const datos = {
+            fecha: fecha,
+            proveedor: proveedor,
+            chofer: chofer,
+            control: nControl,
+            material: agregado,
+            m3: cantidad
+        };
+
+        console.log('datos length =' + datos.length);
+        const tabla = 'materiales'
+
+        ipcRenderer.send('guardar', datos, tabla);
+        form.reset()
+    };
+
+//SELECT fecha, proveedor, sum(m3) as m3, sum(tn) FROM electron_crud.materiales WHERE fecha BETWEEN '2018-12-1' and '3019-1-1' GROUP BY proveedor ORDER BY proveedor ASC; 
+
+</script>
+
+</html>

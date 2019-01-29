@@ -74,6 +74,21 @@ function enviarDatos() {
         console.log('Clientes Cargadas');
         console.log('-------------------------------');
     });
+    query = 'SELECT DISTINCT nombre FROM electron_crud.proveedores ORDER BY nombre ASC';
+    conexion.query(query, (err, row) => {
+        if (err) {
+            console.log('Hubo un error: ');
+            console.log(err);
+            return;
+        }
+        let proveedor = row;
+        mainWindow.webContents.send('carga4', proveedor);
+
+        console.log('Clientes cargados!');
+        console.log('*******************************');
+        console.log('Clientes Cargadas');
+        console.log('-------------------------------');
+    });
 };
 
 
@@ -111,9 +126,10 @@ ipcMain.on('borrado', (e, id) => {
     });
 });
 
-ipcMain.on('guardar', (e, datos) => {
+ipcMain.on('guardar', (e, datos, tabla) => {
     console.log('Guardando = ' + datos);
-    let query = 'INSERT INTO despachohs set ?';
+    let query = 'INSERT INTO ' + tabla + ' set ?';
+    console.log('SQL = ' + query);
     conexion.query(query, [datos], (err, row) => {
         if (err) {
             console.log('Hubo un error: ');

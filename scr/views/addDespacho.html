@@ -103,8 +103,9 @@ const datos = {
 };
 
 console.log('datos length =' + datos.length);
+const tabla = 'despachohs'
 
-ipcRenderer.send('guardar', datos);
+ipcRenderer.send('guardar', datos, tabla);
 form.reset()
 };
 

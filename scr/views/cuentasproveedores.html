@@ -30,19 +30,16 @@
           </ul>
           <div class="ml-3 mt-1">
             <a href="proveedores.html"><button class="btn btn-primary">Consulta General</button></a>
-            <a href="cuentasproveedores.html"><button class="btn btn-primary active">Consulta</button></a>
+            <a href="cuentasproveedores.html"><button class="btn btn-primary active">Cuentas por pagar</button></a>
+            <a href="addentrada.html"><button class="btn btn-primary active">Agregar entrada</button></a>
           </div>
        
 
         <div class="row m-3">
             <div class="col">
                 <div class="card p-2">
+                    <!--
                     <form id="form2" class="m-1">
-
-                        <!--
-                                <input onkeyup="onKeyUp(event)" id="txtBuscar" type="text" class="form-control" placeholder="Buscar"
-                                aria-label="Recipient's username" aria-describedby="button-addon2" autofocus>
-                            -->
                         <div class="row">
                             <div class="col">
                                 <label for="exampleFormControlSelect1">Proveedores</label>
@@ -80,19 +77,19 @@
                             </div>
                         </div>
 
-                    </form>
+                    </form>-->
                     <input type="button" onclick="printDiv('areaImprimir')" value="imprimir div" />
                     <div id="areaImprimir">
                         <table class="table">
                             <thead>
                                 <tr>
                                     <th scope="col" class="p-1">Fecha</th>
-                                    <th scope="col" class="p-1">Clientes</th>
-                                    <th scope="col" class="p-1">Direccion</th>
-                                    <th scope="col" class="p-1">Ticket</th>
-                                    <th scope="col" class="p-1">Resistencia</th>
-                                    <th scope="col" class="p-1">Volumen</th>
-                                    <th scope="col" class="p-1">Unidad</th>
+                                    <th scope="col" class="p-1">Proveedor</th>
+                                    <th scope="col" class="p-1">Material</th>
+                                    <th scope="col" class="p-1">Cantidad</th>
+                                    <th scope="col" class="p-1">Precio</th>
+                                    <th scope="col" class="p-1">Saldo</th>
+                                    <th scope="col" class="p-1">Observaciones</th>
                                 </tr>
                             </thead>
                             <tbody id="txt">
