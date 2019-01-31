@@ -19,21 +19,27 @@
                 <a href=""><button class="nav-link btn btn-primary">Dashboard</button></a>
             </li>
             <li class="nav-item">
-                <a href="index.html"><button class="nav-link btn btn-primary active">Consulta Clientes</button></a>
+                <a href="index.html"><button class="nav-link btn btn-primary">Consulta Clientes</button></a>
             </li>
             <li class="nav-item">
-                <a href="proveedores.html"><button class="nav-link btn btn-primary">Consulta Proveedores</button></a>
+                <a href="proveedores.html"><button class="nav-link btn btn-primary active">Consulta Proveedores</button></a>
             </li>
             <li class="nav-item">
                 <a href=""><button class="nav-link btn btn-primary" tabindex="-1" aria-disabled="true">Disabled</button></a>
             </li>
         </ul>
-        <h2 class="text-center">Agregar Datos</h2>
-            <form id="form">
-                <div class="row">
+        <div class="ml-3 mt-1">
+            <a href="proveedores.html"><button class="btn btn-primary">Consulta General</button></a>
+            <a href="cuentasproveedores.html"><button class="btn btn-primary">Cuentas por pagar</button></a>
+            <a href="addentrada.html"><button class="btn btn-primary active">Agregar entrada</button></a>
+            <a href="addProveedor.html"><button class="btn btn-primary">Agregar proveedor</button></a>
+        </div>
+        <h2 class="text-center">Registrar Entrada de Agregados</h2>
+        <form id="form">
+            <div class="row">
                 <div class="col-6">
                     <div class="form-group">
-                            <label for="exampleFormControlSelect1">Fecha</label>
+                        <label for="exampleFormControlSelect1">Fecha</label>
                         <input class="form-control" type="date" id="fecha">
                     </div>
                     <div class="form-group">
@@ -59,21 +65,41 @@
                 <div class="col-6">
                     <div class="form-group">
                         <label for="exampleFormControlSelect1">Chofer</label>
-                        <input class="form-control" type="text" id="chofer">
+                        <select id="txtChofer" type="text" class="form-control form-control-sm">
+                            <option>-</option>
+                        </select>
                     </div>
                     <div class="form-group">
                         <label for="exampleFormControlSelect1">N. de Control</label>
                         <input class="form-control" type="text" id="nControl">
                     </div>
-                    <div class="form-group">
-                        <label for="exampleFormControlSelect1">Cantidad</label>
-                        <input class="form-control" type="text" id="Cantidad">
+                    <div class="row">
+                        <div class="col">
+                            <div class="form-group">
+                                <label for="exampleFormControlSelect1">Cantidad</label>
+                                <input class="form-control" type="text" id="Cantidad">
+
+
+                            </div>
+                        </div>
+                        <div class="col">
+                            <div class="form-check form-check-inline mt-4">
+                                <input class="form-check-input" type="radio" name="inlineRadioOptions" id="optionM3"
+                                    value="1">
+                                <label class="form-check-label" for="inlineRadio1">m3</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="inlineRadioOptions" id="optionTn"
+                                    value="2">
+                                <label class="form-check-label" for="inlineRadio2">Tn</label>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
                 <button class="btn btn-success btn-block mx-3">Guardar</button>
             </div>
-            </form>
+        </form>
 
 
     </div>
@@ -104,18 +130,34 @@
         const fecha = document.querySelector('#fecha').value;
         const proveedor = document.querySelector('#txtBuscar').value;
         const agregado = document.querySelector('#agregadoValue').value;
-        const chofer = document.querySelector('#chofer').value;
+        const chofer = document.querySelector('#txtChofer').value;
         const nControl = document.querySelector('#nControl').value;
         const cantidad = document.querySelector('#Cantidad').value;
+        
+        if (document.querySelector('#optionM3').checked) {
+            console.log('check 1')
+            datos = {
+                fecha: fecha,
+                proveedor: proveedor,
+                chofer: chofer,
+                control: nControl,
+                material: agregado,
+                m3: cantidad
+            };
+        }
 
-        const datos = {
-            fecha: fecha,
-            proveedor: proveedor,
-            chofer: chofer,
-            control: nControl,
-            material: agregado,
-            m3: cantidad
-        };
+        else {
+            console.log('check 2')
+            datos = {
+                fecha: fecha,
+                proveedor: proveedor,
+                chofer: chofer,
+                control: nControl,
+                material: agregado,
+                tn: cantidad
+            };
+        }
+
 
         console.log('datos length =' + datos.length);
         const tabla = 'materiales'
