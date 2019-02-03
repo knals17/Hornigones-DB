@@ -16,25 +16,26 @@
     <div class="container-fluid">
         <ul class="nav bg-secondary mt-2">
             <li class="nav-item">
-                    <a href=""><button class="nav-link btn btn-primary">Dashboard</button></a>
-                  </li>
-            <li class="nav-item">
-              <a href="index.html"><button class="nav-link btn btn-primary ">Consulta Clientes</button></a>
+                <a href=""><button class="nav-link btn btn-primary">Dashboard</button></a>
             </li>
             <li class="nav-item">
-                    <a href="proveedores.html"><button class="nav-link btn btn-primary active">Consulta Proveedores</button></a>
-                </li>
-            <li class="nav-item">
-              <a href=""><button class="nav-link btn btn-primary" tabindex="-1" aria-disabled="true">Disabled</button></a>
+                <a href="index.html"><button class="nav-link btn btn-primary ">Consulta Clientes</button></a>
             </li>
-          </ul>
-          <div class="ml-3 mt-1">
+            <li class="nav-item">
+                <a href="proveedores.html"><button class="nav-link btn btn-primary active">Consulta Proveedores</button></a>
+            </li>
+            <li class="nav-item">
+                <a href=""><button class="nav-link btn btn-primary" tabindex="-1" aria-disabled="true">Disabled</button></a>
+            </li>
+        </ul>
+        <div class="ml-3 mt-1">
             <a href="proveedores.html"><button class="btn btn-primary">Consulta General</button></a>
             <a href="cuentasproveedores.html"><button class="btn btn-primary active">Cuentas por pagar</button></a>
             <a href="addentrada.html"><button class="btn btn-primary">Agregar entrada</button></a>
             <a href="addProveedor.html"><button class="btn btn-primary">Agregar proveedor</button></a>
-          </div>
-       
+            <a href="listproveedores.html"><button class="btn btn-primary">Proveedores</button></a>
+        </div>
+
 
         <div class="row m-3">
             <div class="col">
@@ -79,24 +80,30 @@
                         </div>
 
                     </form>-->
-                    <input type="button" onclick="printDiv('areaImprimir')" value="imprimir div" />
+                    
                     <div id="areaImprimir">
                         <table class="table">
                             <thead>
                                 <tr>
                                     <th scope="col" class="p-1">Fecha</th>
                                     <th scope="col" class="p-1">Proveedor</th>
+                                    <th scope="col" class="p-1">Chofer</th>
+                                    <th scope="col" class="p-1">N° de Control</th>
                                     <th scope="col" class="p-1">Material</th>
-                                    <th scope="col" class="p-1">Cantidad</th>
-                                    <th scope="col" class="p-1">Precio</th>
-                                    <th scope="col" class="p-1">Saldo</th>
-                                    <th scope="col" class="p-1">Observaciones</th>
+                                    <th scope="col" class="p-1">Volumen(m3)</th>
+                                    <th scope="col" class="p-1">Peso(Tn)</th>
+                                    <th scope="col" class="p-1">Costo</th>
+                                    <th scope="col" class="p-1">Pagar</th>
                                 </tr>
                             </thead>
                             <tbody id="txt">
 
                             </tbody>
                         </table>
+                    </div>
+                    <div class="row">
+                        <input class="btn btn-warning col mr-1 ml-3" type="button" onclick="printDiv('areaImprimir')" value="imprimir div" />
+                        <button class="btn btn-primary btn-block col ml-1 mr-3" onclick="pagar()">Pagar</button>
                     </div>
                 </div>
                 <nav aria-label="Page navigation example">
@@ -106,152 +113,171 @@
                 </nav>
 
 
+
             </div>
             <script>
-                const form2 = document.querySelector("#form2");
-                form2.addEventListener('submit', (e) => {
-                    e.preventDefault();
-                    console.log('Ejecutado')
-                    filtrado();
-                });
 
                 const txt = document.querySelector('#txt');
                 const txtBuscar = document.querySelector('#txtBuscar');
                 const paginas = document.querySelector('#paginas');
                 const { ipcRenderer } = require('electron');
 
-                ipcRenderer.on('carga3', (e, buscardata) => {
-                    //console.log(datos[0].fecha)
-                    txtBuscar.innerHTML += ``;
-                    for (var i = 0; i < buscardata.length; i++) {
-                        txtBuscar.innerHTML += `
-                        <option>${buscardata[i].proveedor}</option>`;
-                    }
+                let listaDatos = [];
+                let listaModificar = [];
 
-                });
+                load();
 
+                function load() {
+                    let sql = '';
+                    sql = 'select * from electron_crud.materiales where fecha between "2019-01-01" and "3000-01-01" and Material = "granza" and pagado = 0 order by proveedor asc;';
 
-                function filtrado() {
-                    const consulta = document.querySelector('#txtBuscar').value;
-                    const resistenciavalue = document.querySelector('#resistenciavalue').value;
-                    let fechainit = document.querySelector('#fechainit').value
-                    let fechaend = document.querySelector('#fechaend').value
-                    let sql = "";
-                    let sqlCuenta = "";
+                    ipcRenderer.send('encontrar', sql);
 
-                    if (fechainit == "") {
-                        fechainit = '2000-01-01'
-                    }
-                    if (fechaend == "") {
-                        fechaend = '3000-01-01'
-                    }
-
-                    sql = 'SELECT * FROM materiales WHERE fecha BETWEEN "' + fechainit + '" AND "' + fechaend + '"';
-                    sqlCuenta = 'SELECT COUNT(*) AS registros FROM materiales WHERE fecha BETWEEN "' + fechainit + '" AND "' + fechaend + '"';
-
-                    if (consulta != "") {
-                        sql += ' AND proveedor = "' + consulta + '"';
-                        sqlCuenta += ' AND proveedor = "' + consulta + '"';
-                    }
-
-                    if (resistenciavalue != "-") {
-                        sql += ' AND resistencia = "' + resistenciavalue + '"';
-                        sqlCuenta += ' AND resistencia = "' + resistenciavalue + '"';
-                    }
-
-
-
-                    ipcRenderer.send('filtrar', sql, sqlCuenta);
-
-                    ipcRenderer.on('filtro', (e, datos) => {
-                        txt.innerHTML = '';
-                        console.log('Buscando DATOS');
+                    ipcRenderer.on('encontro', (e, datos) => {
+                        let nombreAnterior = datos[0].proveedor;
+                        let volumenValor = 0;
+                        let pesoValor = 0;
+                        let precioValor = 0;
+                        txt.innerHTML += `<tr><th>${nombreAnterior}</th></tr>`
                         for (var i = 0; i < datos.length; i++) {
-                            txt.innerHTML += `
-                    <tr>
-                        <td class="p-1">${datos[i].fecha}</td>
-                        <td class="p-1">${datos[i].proveedor}</td>
-                        <td class="p-1">${datos[i].chofer}</td>
-                        <td class="p-1">${datos[i].control}</td>
-                        <td class="p-1">${datos[i].material}</td>
-                        <td class="p-1">${datos[i].m3}</td>
-                        <td class="p-1">${datos[i].tn}</td>
-                    </tr>`;
-                        };
-                    });
-                    ipcRenderer.on('cuenta', (e, cuenta) => {
-                        console.log('Cuenta = ' + cuenta[0].registros)
-                        const paginacion = (cuenta[0].registros / 50);
-                        console.log(paginacion)
-                        paginas.innerHTML = `
-                    <li class="page-item">
-                            <a class="page-link" href="#" aria-label="Previous">
-                                <span aria-hidden="true">&laquo;</span>
-                            </a>
-                        </li>
-                    `;
-                        for (var i = 0; i < paginacion; i++) {
-                            paginas.innerHTML += `
-                        <li class="page-item"><a onclick ="pagina(${i})" class="page-link" href="#">${i}</a></li>`;
+                            if (nombreAnterior != datos[i].proveedor) {
+                                txt.innerHTML += `
+                                    <td class="p-1"></td>
+                                    <td class="p-1"></td>
+                                    <td class="p-1"></td>
+                                    <td class="p-1"></td>
+                                    <td class="p-1"></td>
+                                    <td class="p-1"><b>${volumenValor}</b></td>
+                                    <td class="p-1"><b>${pesoValor}</b></td>
+                                    <td class="p-1"><b>${precioValor}Bs</b></td>
+                                    <tr><th>${datos[i].proveedor}</th></b></tr>
+                                    <tr>
+                                        <td class="p-1">${datos[i].fecha}</td>
+                                        <td class="p-1">${datos[i].proveedor}</td>
+                                        <td class="p-1">${datos[i].chofer}</td>
+                                        <td class="p-1">${datos[i].control}</td>
+                                        <td class="p-1">${datos[i].material}</td>
+                                        <td class="p-1">${datos[i].m3}</td>
+                                        <td class="p-1">${datos[i].tn}</td>
+                                        <td class="p-1">${datos[i].preciom * datos[i].m3 + (datos[i].preciom * datos[i].tn)}Bs</td>
+                                        <td class="p-1"><div class="form-group form-check">
+                                            <input type="checkbox" class="form-check-input" id="${datos[i].Id}">
+                                        </div></td>
+                                     </tr>`;
+                                listaDatos.push(datos[i].Id)
+                                nombreAnterior = datos[i].proveedor
+                                volumenValor = datos[i].m3
+                                pesoValor = datos[i].tn
+                                precioValor = datos[i].preciom * datos[i].m3 + (datos[i].preciom * datos[i].tn)
+                            } else {
+                                txt.innerHTML += `
+                                    <tr>
+                                        <td class="p-1">${datos[i].fecha}</td>
+                                        <td class="p-1">${datos[i].proveedor}</td>
+                                        <td class="p-1">${datos[i].chofer}</td>
+                                        <td class="p-1">${datos[i].control}</td>
+                                        <td class="p-1">${datos[i].material}</td>
+                                        <td class="p-1">${datos[i].m3}</td>
+                                        <td class="p-1">${datos[i].tn}</td>
+                                        <td class="p-1">${datos[i].preciom * datos[i].m3 + (datos[i].preciom * datos[i].tn)}Bs</td>
+                                        <td class="p-1"><div class="form-group form-check">
+                                            <input type="checkbox" class="form-check-input" id="${datos[i].Id}">
+                                        </div></td>
+                                    </tr>`;
+                                listaDatos.push(datos[i].Id)
+                                nombreAnterior = datos[i].proveedor
+                                volumenValor += datos[i].m3
+                                pesoValor += datos[i].tn
+                                precioValor += datos[i].preciom * datos[i].m3 + (datos[i].preciom * datos[i].tn)
+                            }
+
                         }
-                        paginas.innerHTML += `
-                    <li class="page-item">
-                            <a class="page-link" href="#" aria-label="Next">
-                                <span aria-hidden="true">&raquo;</span>
-                            </a>
-                        </li>
-                    `;
-
-                    });
-                };
-
-                function pagina(num) {
-                    num = num  * 50;
-                    const consulta = document.querySelector('#txtBuscar').value;
-                    const resistenciavalue = document.querySelector('#resistenciavalue').value;
-                    let fechainit = document.querySelector('#fechainit').value
-                    let fechaend = document.querySelector('#fechaend').value
-                    let sql = "";
-
-                    if (fechainit == "") {
-                        fechainit = '2000-01-01'
-                    }
-                    if (fechaend == "") {
-                        fechaend = '3000-01-01'
-                    }
-
-                    sql = 'SELECT * FROM materiales WHERE fecha BETWEEN "' + fechainit + '" AND "' + fechaend + '"';
-
-                    if (consulta != "") {
-                        sql += ' AND proveedor = "' + consulta + '"';
-                    }
-
-                    if (resistenciavalue != "-") {
-                        sql += ' AND resistencia = "' + resistenciavalue + '"';
-                    }
-
-                    sql += ' LIMIT ' + num + ' , 50';
-
-
-                    ipcRenderer.send('pagina', sql);
-
-                    ipcRenderer.on('paginacarga', (e, datos) => {
-                        txt.innerHTML = '';
-                        for (var i = 0; i < datos.length; i++) {
-                            txt.innerHTML += `
-                    <tr>
-                            <td class="p-1">${datos[i].fecha}</td>
-                        <td class="p-1">${datos[i].proveedor}</td>
-                        <td class="p-1">${datos[i].chofer}</td>
-                        <td class="p-1">${datos[i].control}</td>
-                        <td class="p-1">${datos[i].material}</td>
-                        <td class="p-1">${datos[i].m3}</td>
-                        <td class="p-1">${datos[i].tn}</td>
-                    </tr>`;
-                        }
-                    });
-
+                        txt.innerHTML += `
+                                    <td class="p-1"></td>
+                                    <td class="p-1"></td>
+                                    <td class="p-1"></td>
+                                    <td class="p-1"></td>
+                                    <td class="p-1"></td>
+                                    <td class="p-1"><b>${volumenValor}</b></td>
+                                    <td class="p-1"><b>${pesoValor}</b></td>
+                                    <td class="p-1"><b>${precioValor}Bs</b></td>
+                                    `
+                        console.log(listaDatos)
+                    })
                 }
+
+
+                function pagar() {
+                    for (var i = 0; i < listaDatos.length; i++) {
+                        var isChecked = document.getElementById(listaDatos[i]).checked;
+                        if (isChecked) {
+                            listaModificar.push(listaDatos[i])
+                        }
+                    }
+                    console.log(listaModificar);
+                    for (var i = 0; i < listaModificar.length; i++) {
+                        sql = 'UPDATE electron_crud.materiales SET pagado = 1 WHERE Id = ' + listaModificar[i] + ';'
+                    ipcRenderer.send('actualizar', sql);
+                    }
+                    //load();
+                    location.reload();
+                }
+
+                function printDiv(nombreDiv) {
+                    var contenido = document.getElementById(nombreDiv).innerHTML;
+                    var contenidoOriginal = document.body.innerHTML;
+
+                    document.body.innerHTML = contenido;
+
+                    window.print();
+
+                    document.body.innerHTML = contenidoOriginal;
+                }
+
+
+                /*
+                sql = 'select Nombre from electron_crud.proveedores where Material ="granza" order by Nombre ASC;'
+                                ipcRenderer.send('encontrar', sql);
+
+                                ipcRenderer.on('encontro', (e, datos) => {
+                                    console.log(datos.length);
+                                    for (var i = 0; i < datos.length; i++) {
+                                        let nombreB = datos[i].Nombre;
+                                        txt.innerHTML += `<h4 id="${nombreB}h"></h4>
+                                        <div id="${nombreB}t">
+
+                                        </div>
+                                        `;
+
+                                        sql = 'select * from electron_crud.materiales where fecha between "2019-01-01" and "3000-01-01" and proveedor = "' + nombreB + '" and Material ="granza" and pagado = 0 order by proveedor asc;'
+                                        ipcRenderer.send('encontrar', sql);
+
+                                        ipcRenderer.on('encontro', (e, dato) => {
+                                            document.getElementById(nombreB + "h").textContent += nombreB
+                                            for (var i = 0; i < dato.length; i++) {
+                                                document.getElementById(nombreB + "t").innerHTML += `
+                                    <tr>
+                                        <td class="p-1">${dato[i].fecha}</td>
+                                        <td class="p-1">${dato[i].proveedor}</td>
+                                        <td class="p-1">${dato[i].chofer}</td>
+                                        <td class="p-1">${dato[i].control}</td>
+                                        <td class="p-1">${dato[i].material}</td>
+                                        <td class="p-1">${dato[i].m3}</td>
+                                        <td class="p-1">${dato[i].tn}</td>
+                                        <td class="p-1">${dato[i].preciom * dato[i].m3 + (dato[i].preciom * dato[i].tn)}Bs</td>
+                                        <td class="p-1"><div class="form-group form-check">
+                                            <input type="checkbox" class="form-check-input" id="exampleCheck1">
+                                            <label class="form-check-label" for="exampleCheck1"></label>
+                                        </div></td>
+                                    </tr>`;
+                                            }
+                                        })
+                                    }
+                                })
+
+                */
+
+
 
             </script>
 </body>

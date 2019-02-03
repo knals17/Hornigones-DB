@@ -33,6 +33,7 @@
             <a href="cuentasproveedores.html"><button class="btn btn-primary">Cuentas por pagar</button></a>
             <a href="addentrada.html"><button class="btn btn-primary active">Agregar entrada</button></a>
             <a href="addProveedor.html"><button class="btn btn-primary">Agregar proveedor</button></a>
+            <a href="listproveedores.html"><button class="btn btn-primary">Proveedores</button></a>
         </div>
         <h2 class="text-center">Registrar Entrada de Agregados</h2>
         <form id="form">
@@ -106,11 +107,12 @@
 </body>
 
 <script>
+    console.log('Iniciando')
     const { ipcRenderer } = require('electron');
 
     const form = document.querySelector('#form');
     form.addEventListener('submit', (e) => {
-        e.preventDefault();
+        //e.preventDefault();
         guardar();
     });
 
@@ -119,6 +121,16 @@
         txtBuscar.innerHTML += ``;
         for (var i = 0; i < buscardata.length; i++) {
             txtBuscar.innerHTML += `
+                        <option>${buscardata[i].nombre}</option>`;
+        }
+
+    });
+
+    ipcRenderer.on('carga5', (e, buscardata) => {
+        //console.log(datos[0].fecha)
+        txtChofer.innerHTML += ``;
+        for (var i = 0; i < buscardata.length; i++) {
+            txtChofer.innerHTML += `
                         <option>${buscardata[i].nombre}</option>`;
         }
 
@@ -133,37 +145,64 @@
         const chofer = document.querySelector('#txtChofer').value;
         const nControl = document.querySelector('#nControl').value;
         const cantidad = document.querySelector('#Cantidad').value;
-        
-        if (document.querySelector('#optionM3').checked) {
-            console.log('check 1')
-            datos = {
-                fecha: fecha,
-                proveedor: proveedor,
-                chofer: chofer,
-                control: nControl,
-                material: agregado,
-                m3: cantidad
-            };
-        }
+        var precioMaterial = "";
+        var precioFlete = "";
 
-        else {
-            console.log('check 2')
-            datos = {
-                fecha: fecha,
-                proveedor: proveedor,
-                chofer: chofer,
-                control: nControl,
-                material: agregado,
-                tn: cantidad
-            };
-        }
+        const sql = 'SELECT(SELECT precio  FROM electron_crud.proveedores WHERE nombre = "' + proveedor + '" AND Material = "' + agregado + '") AS proveedor, (SELECT precio  FROM electron_crud.proveedores WHERE nombre = "' + chofer + '" AND Material = "flete") AS flete;';
 
+        ipcRenderer.send('encontrar', sql);
 
-        console.log('datos length =' + datos.length);
-        const tabla = 'materiales'
+        ipcRenderer.on('encontro', (e, datos) => {
+            precioMaterial = datos[0].proveedor
+            precioFlete = datos[0].flete
+            if (precioMaterial == null){
+                alert('El proveedor indicado no posee un precio establecido para este agregado!')
+                return
+            }
+            console.log('1= ' + precioMaterial);
+            console.log('1= ' + precioFlete);
+            if (chofer == "-") {
+                precioFlete = '0.00';
+            }
 
-        ipcRenderer.send('guardar', datos, tabla);
-        form.reset()
+            if (document.querySelector('#optionM3').checked) {
+                console.log('check 1')
+                datos = {
+                    fecha: fecha,
+                    proveedor: proveedor,
+                    chofer: chofer,
+                    control: nControl,
+                    material: agregado,
+                    m3: cantidad,
+                    preciom: precioMaterial,
+                    preciof: precioFlete
+                };
+            }
+
+            else {
+                console.log('check 2')
+                datos = {
+                    fecha: fecha,
+                    proveedor: proveedor,
+                    chofer: chofer,
+                    control: nControl,
+                    material: agregado,
+                    tn: cantidad,
+                    preciom: precioMaterial,
+                    preciof: precioFlete
+                };
+            }
+
+            console.log(precioMaterial);
+            console.log(precioFlete);
+
+            console.log('datos length =' + datos.length);
+            const tabla = 'materiales'
+
+            ipcRenderer.send('guardar', datos, tabla);
+            form.reset()
+
+        });
     };
 
 //SELECT fecha, proveedor, sum(m3) as m3, sum(tn) FROM electron_crud.materiales WHERE fecha BETWEEN '2018-12-1' and '3019-1-1' GROUP BY proveedor ORDER BY proveedor ASC; 

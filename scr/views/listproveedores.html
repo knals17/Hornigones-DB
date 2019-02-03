@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+    <link rel="stylesheet" href="https://bootswatch.com/4/superhero/bootstrap.min.css" crossorigin="anonymous">
+
+    <title>Document</title>
+
+</head>
+
+<body>
+    <div class="container-fluid">
+        <ul class="nav bg-secondary mt-2">
+            <li class="nav-item">
+                <a href=""><button class="nav-link btn btn-primary">Dashboard</button></a>
+            </li>
+            <li class="nav-item">
+                <a href="index.html"><button class="nav-link btn btn-primary ">Consulta Clientes</button></a>
+            </li>
+            <li class="nav-item">
+                <a href="proveedores.html"><button class="nav-link btn btn-primary active">Consulta Proveedores</button></a>
+            </li>
+            <li class="nav-item">
+                <a href=""><button class="nav-link btn btn-primary" tabindex="-1" aria-disabled="true">Disabled</button></a>
+            </li>
+        </ul>
+        <div class="ml-3 mt-1">
+            <a href="proveedores.html"><button class="btn btn-primary">Consulta General</button></a>
+            <a href="cuentasproveedores.html"><button class="btn btn-primary">Cuentas por pagar</button></a>
+            <a href="addentrada.html"><button class="btn btn-primary">Agregar entrada</button></a>
+            <a href="addProveedor.html"><button class="btn btn-primary">Agregar proveedor</button></a>
+            <a href="listproveedores.html"><button class="btn btn-primary active">Proveedores</button></a>
+        </div>
+
+
+        <div class="row m-3">
+            <div class="col">
+                <div class="card p-2">
+                    <form id="form2" class="m-1">
+
+                        <!--
+                                <input onkeyup="onKeyUp(event)" id="txtBuscar" type="text" class="form-control" placeholder="Buscar"
+                                aria-label="Recipient's username" aria-describedby="button-addon2" autofocus>
+                            -->
+                        <div class="row">
+                            <div class="col">
+                                <label for="exampleFormControlSelect1">Proveedores</label>
+                                <select id="txtBuscar" type="text" class="form-control form-control-sm">
+
+                                </select>
+                            </div>
+                            <div class="col">
+                                <label for="exampleFormControlSelect1">Material</label>
+                                <select id="resistenciavalue" class="form-control form-control-sm">
+                                    <option>-</option>
+                                    <option>Granza</option>
+                                    <option>Piedra</option>
+                                    <option>Cemento</option>
+                                    <option>Agua</option>
+                                    <option>Aditivo</option>
+                                    <option>Fibra</option>
+                                    <option>Hidrofugo</option>
+                                </select>
+                            </div>
+                            <div class="col">
+                                <div class="d-flex justify-content-center">
+                                    <button class="btn btn-info mt-4 btn-block" id="button-addon2">Buscar</button>
+                                </div>
+
+                            </div>
+                        </div>
+
+                        <div class="row mb-2">
+                            <div class="col">
+                                <label for="exampleFormControlSelect1">Desde</label>
+                                <input id="fechainit" class="form-control form-control-sm" type="date">
+                            </div>
+                            <div class="col">
+                                <label for="exampleFormControlSelect1">Hasta</label>
+                                <input id="fechaend" class="form-control form-control-sm" type="date">
+                            </div>
+                        </div>
+
+                    </form>
+                    <input type="button" onclick="printDiv('areaImprimir')" value="imprimir div" />
+                    <div id="areaImprimir">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th scope="col" class="p-1">Nombre o Razon Social</th>
+                                    <th scope="col" class="p-1">Cedula o RIF</th>
+                                    <th scope="col" class="p-1">Material</th>
+                                    <th scope="col" class="p-1">Precio</th>
+                                    <th scope="col" class="p-1">Accion</th>
+                                </tr>
+                            </thead>
+                            <tbody id="txt">
+                                    <!--td id="nombreProveedor1" class="p-1">ESTOOOOOOOOO</td>-->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <nav aria-label="Page navigation example">
+                    <ul class="pagination" id="paginas">
+
+                    </ul>
+                </nav>
+
+
+            </div>
+            <script>
+                //console.log(document.querySelector('#nombreProveedor1'));
+
+                const { ipcRenderer } = require('electron');
+                const txt = document.querySelector('#txt');
+                const txtBuscar = document.querySelector('#txtBuscar');
+                const paginas = document.querySelector('#paginas');
+                /*const form2 = document.querySelector("#form2");
+                form2.addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    console.log('Ejecutado')
+                    filtrado();
+                });
+
+                
+                
+
+                ipcRenderer.on('carga3', (e, buscardata) => {
+                    //console.log(datos[0].fecha)
+                    txtBuscar.innerHTML += ``;
+                    for (var i = 0; i < buscardata.length; i++) {
+                        txtBuscar.innerHTML += `
+                        <option>${buscardata[i].proveedor}</option>`;
+                    }
+
+                });*/
+                load();
+
+                function load() {
+                    const sql = 'SELECT * FROM electron_crud.proveedores ORDER BY Nombre ASC;'
+                    ipcRenderer.send('encontrar', sql);
+
+                    ipcRenderer.on('encontro', (e, datos) => {
+                        txt.innerHTML = '';
+                        console.log('Buscando DATOS');
+                        for (var i = 0; i < datos.length; i++) {
+                            txt.innerHTML += `
+                    <tr id="${datos[i].Id}">
+                        <td id="nombreProveedor${datos[i].Id}" class="p-1">${datos[i].Nombre}</td>
+                        <td id="cedulaRif${datos[i].Id}" class="p-1">${datos[i].rif}</td>
+                        <td id="materialProveedor${datos[i].Id}" class="p-1">${datos[i].Material}</td>
+                        <td id="precioProveedor${datos[i].Id}" class="p-1">${datos[i].precio}</td>
+                        <td class="p-1"><button onclick="modificar(${datos[i].Id})" class="btn btn-success btn-sm m-0">Modificar</button>
+                        <button onclick="borrar(${datos[i].Id})" class="btn btn-danger btn-sm m-0">Borrar</button></td>
+                        </tr>`;
+
+                        };
+
+                    });
+
+
+                    ipcRenderer.on('cuenta', (e, cuenta) => {
+                        console.log('Cuenta = ' + cuenta[0].registros)
+                        const paginacion = (cuenta[0].registros / 50);
+                        console.log(paginacion)
+                        paginas.innerHTML = `
+                    <li class="page-item">
+                            <a class="page-link" href="#" aria-label="Previous">
+                                <span aria-hidden="true">&laquo;</span>
+                            </a>
+                        </li>
+                    `;
+                        for (var i = 0; i < paginacion; i++) {
+                            paginas.innerHTML += `
+                        <li class="page-item"><a onclick ="pagina(${i})" class="page-link" href="#">${i}</a></li>`;
+                        }
+                        paginas.innerHTML += `
+                    <li class="page-item">
+                            <a class="page-link" href="#" aria-label="Next">
+                                <span aria-hidden="true">&raquo;</span>
+                            </a>
+                        </li>
+                    `;
+
+                    });
+                }
+
+
+                function pagina(num) {
+                    num = num * 50;
+                    const consulta = document.querySelector('#txtBuscar').value;
+                    const resistenciavalue = document.querySelector('#resistenciavalue').value;
+                    let fechainit = document.querySelector('#fechainit').value
+                    let fechaend = document.querySelector('#fechaend').value
+                    let sql = "";
+
+                    if (fechainit == "") {
+                        fechainit = '2000-01-01'
+                    }
+                    if (fechaend == "") {
+                        fechaend = '3000-01-01'
+                    }
+
+                    sql = 'SELECT * FROM materiales WHERE fecha BETWEEN "' + fechainit + '" AND "' + fechaend + '"';
+
+                    if (consulta != "") {
+                        sql += ' AND proveedor = "' + consulta + '"';
+                    }
+
+                    if (resistenciavalue != "-") {
+                        sql += ' AND resistencia = "' + resistenciavalue + '"';
+                    }
+
+                    sql += ' LIMIT ' + num + ' , 50';
+
+
+                    ipcRenderer.send('pagina', sql);
+
+                    ipcRenderer.on('paginacarga', (e, datos) => {
+                        txt.innerHTML = '';
+                        for (var i = 0; i < datos.length; i++) {
+                            txt.innerHTML += `
+                    <tr>
+                            <td class="p-1">${datos[i].fecha}</td>
+                        <td class="p-1">${datos[i].proveedor}</td>
+                        <td class="p-1">${datos[i].chofer}</td>
+                        <td class="p-1">${datos[i].control}</td>
+                        <td class="p-1">${datos[i].material}</td>
+                        <td class="p-1">${datos[i].m3}</td>
+                        <td class="p-1">${datos[i].tn}</td>
+                    </tr>`;
+                        }
+                    });
+
+                }
+
+                function borrar(id) {
+                    ipcRenderer.send('borrado', id, 'proveedores');
+                    load();
+                }
+
+                function modificar(id) {
+                    const tr = document.getElementById(id);
+                    const nombreDATA = document.getElementById('nombreProveedor' + id).textContent;
+                    const cedularifDATA = document.getElementById('cedulaRif' + id).textContent;
+                    const materialDATA = document.getElementById('materialProveedor' + id).textContent;
+                    const precioDATA = document.getElementById('precioProveedor' + id).textContent;
+
+                    tr.innerHTML = `
+                        <td id="nombreProveedor${id}" class="p-1"><input id="nuevoNombre" type="text"></td>
+                        <td id="cedulaRif${id}" class="p-1"><input id="nuevoCedulaRif" type="text"></td>
+                        <td id="materialProveedor${id}" class="p-1"><input id="nuevoMaterial" type="text"></td>
+                        <td id="precioProveedor${id}" class="p-1"><input id="nuevoPrecio" type="text"></td>
+                        <td class="p-1"><button onclick="actualizar(${id})" class="btn btn-primary btn-sm m-0">Guardar</button>
+                        <button onclick="load()" class="btn btn-danger btn-sm m-0">Cancelar</button></td>
+                    `
+                    document.querySelector('#nuevoNombre').value = nombreDATA;
+                    document.querySelector('#nuevoCedulaRif').value = cedularifDATA;
+                    document.querySelector('#nuevoMaterial').value = materialDATA;
+                    document.querySelector('#nuevoPrecio').value = precioDATA;
+                }
+
+                function actualizar(id){
+                    const nombreDATA = document.querySelector('#nuevoNombre').value;
+                    const cedularifDATA = document.querySelector('#nuevoCedulaRif').value;
+                    const materialDATA = document.querySelector('#nuevoMaterial').value;
+                    const precioDATA = document.querySelector('#nuevoPrecio').value;
+                    //console.log(materialDATA)
+                    const sql = 'UPDATE electron_crud.proveedores SET Nombre = "' + nombreDATA + '", rif = "' + cedularifDATA + '", Material = "' + materialDATA + '", precio ="' + precioDATA + '" WHERE Id = ' + id + ';'
+                    console.log(sql)
+                    ipcRenderer.send('actualizar', sql);
+                    load();
+                }
+
+            </script>
+</body>
+
+</html>

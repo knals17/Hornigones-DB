@@ -38,10 +38,6 @@ function enviarDatos() {
         let datos = row;
         mainWindow.webContents.send('carga', datos);
 
-        console.log('Despachos cargados!');
-        console.log('*******************************');
-        console.log('Data Cargadas');
-        console.log('-------------------------------');
     });
     query = 'SELECT DISTINCT cliente FROM electron_crud.despachohs ORDER BY cliente ASC';
     conexion.query(query, (err, row) => {
@@ -53,10 +49,6 @@ function enviarDatos() {
         let clientes = row;
         mainWindow.webContents.send('carga2', clientes);
 
-        console.log('Clientes cargados!');
-        console.log('*******************************');
-        console.log('Clientes Cargadas');
-        console.log('-------------------------------');
     });
 
     query = 'SELECT DISTINCT proveedor FROM electron_crud.materiales ORDER BY proveedor ASC';
@@ -69,10 +61,6 @@ function enviarDatos() {
         let proveedor = row;
         mainWindow.webContents.send('carga3', proveedor);
 
-        console.log('Clientes cargados!');
-        console.log('*******************************');
-        console.log('Clientes Cargadas');
-        console.log('-------------------------------');
     });
     query = 'SELECT DISTINCT nombre FROM electron_crud.proveedores ORDER BY nombre ASC';
     conexion.query(query, (err, row) => {
@@ -84,10 +72,19 @@ function enviarDatos() {
         let proveedor = row;
         mainWindow.webContents.send('carga4', proveedor);
 
-        console.log('Clientes cargados!');
-        console.log('*******************************');
-        console.log('Clientes Cargadas');
-        console.log('-------------------------------');
+
+    });
+    query = 'SELECT DISTINCT nombre FROM electron_crud.proveedores WHERE Material = "flete" ORDER BY nombre ASC';
+    conexion.query(query, (err, row) => {
+        if (err) {
+            console.log('Hubo un error: ');
+            console.log(err);
+            return;
+        }
+        let proveedor = row;
+        mainWindow.webContents.send('carga5', proveedor);
+
+
     });
 };
 
@@ -112,10 +109,24 @@ app.on('ready', () => {
     Menu.setApplicationMenu(mainMenu);
 });
 
-ipcMain.on('borrado', (e, id) => {
-    console.log('Borrando dato! ' + id);
-    let query = 'DELETE FROM despachohs WHERE Id = ?';
-    conexion.query(query, [id], (err, row) => {
+ipcMain.on('borrado', (e, id, tabla) => {
+    console.log('Borrando dato! ' + id + ' de ' + tabla);
+    let query = 'DELETE FROM ' + tabla + ' WHERE Id = ' + id;
+    conexion.query(query, (err, row) => {
+        if (err) {
+            console.log('Hubo un error: ');
+            console.log(err);
+            return;
+        }
+        console.log('Borrado!');
+        enviarDatos();
+    });
+});
+
+ipcMain.on('actualizar', (e, sql) => {
+    console.log('Actualizando dato! ' + sql);
+    let query = sql
+    conexion.query(query, (err, row) => {
         if (err) {
             console.log('Hubo un error: ');
             console.log(err);
@@ -137,7 +148,9 @@ ipcMain.on('guardar', (e, datos, tabla) => {
             return;
         }
         console.log('Guardado!');
-        enviarDatos();
+        if (tabla == 'despachohs'){
+            enviarDatos();
+        }
     });
 });
 
@@ -226,6 +239,22 @@ ipcMain.on('pagina', (e, sql) => {
             console.log('Paginas Cargadas');
             console.log('------------------------------');
             mainWindow.webContents.send('paginacarga', row);
+        });
+});
+
+ipcMain.on('encontrar', (e, sql) => {
+    console.log('Procesando = ' + sql);
+        let query = sql;
+        conexion.query(query, (err, row) => {
+            if (err) {
+                console.log('Hubo un error: ');
+                console.log(err);
+                return;
+            }
+            console.log('******************************');
+            console.log(row);
+            console.log('------------------------------');
+            mainWindow.webContents.send('encontro', row);
         });
 });
 
