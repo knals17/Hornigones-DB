@@ -32,49 +32,40 @@
             <a href="proveedores.html"><button class="btn btn-primary">Consulta General</button></a>
             <a href="cuentasproveedores.html"><button class="btn btn-primary">Cuentas por pagar</button></a>
             <a href="addentrada.html"><button class="btn btn-primary">Agregar entrada</button></a>
-            <a href="facturas.html"><button class="btn btn-primary">Agregar Factura</button></a>
+            <a href="facturas.html"><button class="btn btn-primary active">Agregar Factura</button></a>
             <a href="listproveedores.html"><button class="btn btn-primary">Proveedores</button></a>
         </div>
-        <h2 class="text-center">Registrar proveedor</h2>
+        <h2 class="text-center">Registrar Entrada de Agregados</h2>
         <form id="form">
-            <div class="row">
+            <div class="row justify-content-center">
                 <div class="col-6">
                     <div class="form-group">
-                        <label for="exampleFormControlSelect1">Nombre o Razon social</label>
-                        <input class="form-control" type="text" id="nombre">
+                        <label for="exampleFormControlSelect1">Fecha</label>
+                        <input class="form-control" type="date" id="fecha">
                     </div>
                     <div class="form-group">
-                        <label for="exampleFormControlSelect1">Cedula o RIF</label>
-                        <input class="form-control" type="text" id="cedulaRif">
-                    </div>
-                    <div class="form-group">
-                        <label for="exampleFormControlSelect1">Tipo de Proveedor</label>
-                        <select id="agregadoValue" class="form-control form-control-sm">
-                            <option>Granza</option>
-                            <option>Piedra</option>
-                            <option>Cemento</option>
-                            <option>Agua</option>
-                            <option>Flete</option>
-                            <option>Servicios</option>
-                            <option>Reparaciones o Repuestos</option>
-                            <option>Licoreria</option>
+                        <label for="exampleFormControlSelect1">Proveedor</label>
+                        <select id="txtBuscar" type="text" class="form-control form-control-sm">
+
                         </select>
                     </div>
-                </div>
-                <div class="col-6">
                     <div class="form-group">
-                        <label for="exampleFormControlSelect1">Costo por unidad (Bs)</label>
-                        <input class="form-control" type="text" id="precio">
+                        <label for="exampleFormControlSelect1">N. de Control</label>
+                        <input class="form-control" type="text" id="nControl">
                     </div>
-                            <div class="form-group">
-                                <label for="exampleFormControlSelect1">Factor R</label>
-                                <input class="form-control" type="text" id="factorR">
-
-
-                            </div>
+                    <div class="form-group">
+                        <label for="exampleFormControlSelect1">Monto</label>
+                        <input class="form-control" type="text" id="monto">
+                    </div>
+                    <div class="form-group">
+                        <label for="exampleFormControlTextarea1">Descripcion</label>
+                        <textarea class="form-control" id="descripcion" rows="3"></textarea>
+                    </div>
+                    <button class="btn btn-success btn-block">Guardar</button>
                 </div>
 
-                <button class="btn btn-success btn-block mx-3">Guardar</button>
+
+
             </div>
         </form>
 
@@ -83,6 +74,7 @@
 </body>
 
 <script>
+    console.log('Iniciando')
     const { ipcRenderer } = require('electron');
 
     const form = document.querySelector('#form');
@@ -91,28 +83,38 @@
         guardar();
     });
 
+    ipcRenderer.on('carga4', (e, buscardata) => {
+        //console.log(datos[0].fecha)
+        txtBuscar.innerHTML += ``;
+        for (var i = 0; i < buscardata.length; i++) {
+            txtBuscar.innerHTML += `
+                        <option>${buscardata[i].nombre}</option>`;
+        }
+
+    });
+
+
     function guardar() {
 
-        const nombre = document.querySelector('#nombre').value;
-        const cedulaRif = document.querySelector('#cedulaRif').value;
-        const tipo = document.querySelector('#agregadoValue').value;
-        const precio = document.querySelector('#precio').value;
-        const factorR = document.querySelector('#factorR').value;
-        
+        const fecha = document.querySelector('#fecha').value;
+        const proveedor = document.querySelector('#txtBuscar').value;
+        const nControl = document.querySelector('#nControl').value;
+        const monto = document.querySelector('#monto').value;
+        const descripcion = document.querySelector('#descripcion').value;
+
 
         const datos = {
-                nombre: nombre,
-                rif: cedulaRif,
-                material: tipo,
-                precio: precio,
-                factor: factorR
-            };
+            fecha: fecha,
+            proveedor: proveedor,
+            nfactura: nControl,
+            monto: monto,
+            descripcion: descripcion
+        };
 
-        console.log('datos length =' + datos.length);
-        const tabla = 'proveedores'
-
+        const tabla = 'facturas'
         ipcRenderer.send('guardar', datos, tabla);
         form.reset()
+
     };
 
 //SELECT fecha, proveedor, sum(m3) as m3, sum(tn) FROM electron_crud.materiales WHERE fecha BETWEEN '2018-12-1' and '3019-1-1' GROUP BY proveedor ORDER BY proveedor ASC; 

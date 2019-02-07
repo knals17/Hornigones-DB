@@ -274,6 +274,22 @@ ipcMain.on('encontrar2', (e, sql) => {
         });
 });
 
+ipcMain.on('encontrar3', (e, sql) => {
+    console.log('Procesando = ' + sql);
+        let query = sql;
+        conexion.query(query, (err, row) => {
+            if (err) {
+                console.log('Hubo un error: ');
+                console.log(err);
+                return;
+            }
+            console.log('Busqueda Completada!');
+            //console.log(row);
+            //console.log('------------------------------');
+            mainWindow.webContents.send('encontro3', row);
+        });
+});
+
 
 
 

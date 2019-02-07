@@ -32,7 +32,7 @@
             <a href="proveedores.html"><button class="btn btn-primary">Consulta General</button></a>
             <a href="cuentasproveedores.html"><button class="btn btn-primary active">Cuentas por pagar</button></a>
             <a href="addentrada.html"><button class="btn btn-primary">Agregar entrada</button></a>
-            <a href="addProveedor.html"><button class="btn btn-primary">Agregar proveedor</button></a>
+            <a href="facturas.html"><button class="btn btn-primary">Agregar Factura</button></a>
             <a href="listproveedores.html"><button class="btn btn-primary">Proveedores</button></a>
         </div>
 
@@ -81,6 +81,24 @@
 
                             </tbody>
                         </table>
+                        <table class="table">
+                                <thead class="bg-primary">
+                                    <h4>Facturas y pagos</h4>
+                                    <tr>
+                                        <th scope="col" class="p-1">Fecha</th>
+                                        <th scope="col" class="p-1">Proveedor</th>
+                                        <th scope="col" class="p-1">N° de Control</th>
+                                        <th scope="col" class="p-1">Descripcion</th>
+                                        <th scope="col" class="p-1">Total</th>
+                                        <th scope="col" class="p-1">Abonado</th>
+                                        <th scope="col" class="p-1">Saldo</th>
+                                        <th scope="col" class="p-1">Pagar</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="txt3">
+    
+                                </tbody>
+                            </table>
                         <h2 class="text-center">--------------------------------------------------------</h2>
                         <div id="total">
 
@@ -106,6 +124,7 @@
 
                 const txt = document.querySelector('#txt');
                 const txt2 = document.querySelector('#txt2');
+                const txt3 = document.querySelector('#txt3');
                 const total = document.querySelector('#total');
                 const txtBuscar = document.querySelector('#txtBuscar');
                 const paginas = document.querySelector('#paginas');
@@ -287,7 +306,7 @@
                                     materialAnterior = datos[i].material
                                     volumenValor = datos[i].m3
                                     pesoValor = datos[i].tn
-                                    precioValor = datos[i].preciom * datos[i].m3 + (datos[i].preciom * datos[i].tn)
+                                    precioValor = datos[i].preciof * datos[i].m3 + (datos[i].preciof * datos[i].tn)
                                 } else {
                                     txt2.innerHTML += `
                                     <tr>
@@ -309,6 +328,7 @@
                                     volumenValor += datos[i].m3
                                     pesoValor += datos[i].tn
                                     precioValor += datos[i].preciof * datos[i].m3 + (datos[i].preciof * datos[i].tn)
+                                    console.log(precioValor)
                                 }
 
                             }
@@ -324,13 +344,56 @@
                                     <td class="p-1"><b>${precioValor}Bs</b></td>
                                     `
                             totalGlobal += precioValor;
-                            total.innerHTML += `
-                                    <h5 class="text-center">TOTAL GLOBAL = ${totalGlobal}Bs</h5>
-                                    `
+                            //total.innerHTML += `
+                                    //<h5 class="text-center">TOTAL GLOBAL = ${totalGlobal}Bs</h5>
+                                    //`
                             console.log(listaFlete)
                             console.log(totalGlobal)
                         }
                     })
+                    //-----------------------------------------FACTURAS-----------------------------------------------------------
+                    sql = 'SELECT * FROM electron_crud.facturas;'
+                    ipcRenderer.send('encontrar3', sql);
+
+                    ipcRenderer.on('encontro3', (e, datos) => {
+                        console.log(datos.length)
+
+
+                        if (datos.length == 0) {
+                            total.innerHTML += `
+                                    <h5 class="text-center">TOTAL GLOBAL = ${totalGlobal}Bs</h5>
+                                    `
+                        } else {
+                            for( i = 0; i < datos.length; i++){
+                                txt3.innerHTML += `
+                                    <tr>
+                                        <td class="p-1">${datos[i].fecha}</td>
+                                        <td class="p-1">${datos[i].proveedor}</td>
+                                        <td class="p-1">${datos[i].nfactura}</td>
+                                        <td class="p-1">${datos[i].descripcion}</td>
+                                        <td class="p-1">${datos[i].monto}Bs</td>
+                                        <td class="p-1">${datos[i].abonado}Bs</td>
+                                        <td class="p-1">${datos[i].saldo}Bs</td>
+                                        <td class="p-1"><div class="form-group form-check">
+                                            <input type="checkbox" class="form-check-input" id="${datos[i].Id}">
+                                        </div></td>
+                                    </tr>`;
+                            }
+                            total.innerHTML += `
+                                    <h5 class="text-center">TOTAL GLOBAL = ${totalGlobal}Bs</h5>
+                                    `
+                        }
+                    })
+
+
+
+
+
+
+
+
+
+
                 }
 
 
@@ -379,49 +442,6 @@
 
                     document.body.innerHTML = contenidoOriginal;
                 }
-
-
-                /*
-                sql = 'select Nombre from electron_crud.proveedores where Material ="granza" order by Nombre ASC;'
-                                ipcRenderer.send('encontrar', sql);
-
-                                ipcRenderer.on('encontro', (e, datos) => {
-                                    console.log(datos.length);
-                                    for (var i = 0; i < datos.length; i++) {
-                                        let nombreB = datos[i].Nombre;
-                                        txt.innerHTML += `<h4 id="${nombreB}h"></h4>
-                                        <div id="${nombreB}t">
-
-                                        </div>
-                                        `;
-
-                                        sql = 'select * from electron_crud.materiales where fecha between "2019-01-01" and "3000-01-01" and proveedor = "' + nombreB + '" and Material ="granza" and pagado = 0 order by proveedor asc;'
-                                        ipcRenderer.send('encontrar', sql);
-
-                                        ipcRenderer.on('encontro', (e, dato) => {
-                                            document.getElementById(nombreB + "h").textContent += nombreB
-                                            for (var i = 0; i < dato.length; i++) {
-                                                document.getElementById(nombreB + "t").innerHTML += `
-                                    <tr>
-                                        <td class="p-1">${dato[i].fecha}</td>
-                                        <td class="p-1">${dato[i].proveedor}</td>
-                                        <td class="p-1">${dato[i].chofer}</td>
-                                        <td class="p-1">${dato[i].control}</td>
-                                        <td class="p-1">${dato[i].material}</td>
-                                        <td class="p-1">${dato[i].m3}</td>
-                                        <td class="p-1">${dato[i].tn}</td>
-                                        <td class="p-1">${dato[i].preciom * dato[i].m3 + (dato[i].preciom * dato[i].tn)}Bs</td>
-                                        <td class="p-1"><div class="form-group form-check">
-                                            <input type="checkbox" class="form-check-input" id="exampleCheck1">
-                                            <label class="form-check-label" for="exampleCheck1"></label>
-                                        </div></td>
-                                    </tr>`;
-                                            }
-                                        })
-                                    }
-                                })
-
-                */
 
 
 
