@@ -251,10 +251,26 @@ ipcMain.on('encontrar', (e, sql) => {
                 console.log(err);
                 return;
             }
-            console.log('******************************');
-            console.log(row);
-            console.log('------------------------------');
+            console.log('Busqueda Completada!');
+            //console.log(row);
+            //console.log('------------------------------');
             mainWindow.webContents.send('encontro', row);
+        });
+});
+
+ipcMain.on('encontrar2', (e, sql) => {
+    console.log('Procesando = ' + sql);
+        let query = sql;
+        conexion.query(query, (err, row) => {
+            if (err) {
+                console.log('Hubo un error: ');
+                console.log(err);
+                return;
+            }
+            console.log('Busqueda Completada!');
+            //console.log(row);
+            //console.log('------------------------------');
+            mainWindow.webContents.send('encontro2', row);
         });
 });
 

@@ -40,50 +40,10 @@
         <div class="row m-3">
             <div class="col">
                 <div class="card p-2">
-                    <!--
-                    <form id="form2" class="m-1">
-                        <div class="row">
-                            <div class="col">
-                                <label for="exampleFormControlSelect1">Proveedores</label>
-                                <select id="txtBuscar" type="text" class="form-control form-control-sm">
-
-                                </select>
-                            </div>
-                            <div class="col">
-                                <label for="exampleFormControlSelect1">Material</label>
-                                <select id="resistenciavalue" class="form-control form-control-sm" id="exampleFormControlSelect1">
-                                    <option>-</option>
-                                    <option>180</option>
-                                    <option>210</option>
-                                    <option>250</option>
-                                    <option>280</option>
-                                    <option>300H</option>
-                                </select>
-                            </div>
-                            <div class="col">
-                                <div class="d-flex justify-content-center">
-                                    <button class="btn btn-info mt-4 btn-block" id="button-addon2">Buscar</button>
-                                </div>
-
-                            </div>
-                        </div>
-
-                        <div class="row mb-2">
-                            <div class="col">
-                                <label for="exampleFormControlSelect1">Desde</label>
-                                <input id="fechainit" class="form-control form-control-sm" type="date">
-                            </div>
-                            <div class="col">
-                                <label for="exampleFormControlSelect1">Hasta</label>
-                                <input id="fechaend" class="form-control form-control-sm" type="date">
-                            </div>
-                        </div>
-
-                    </form>-->
-                    
                     <div id="areaImprimir">
                         <table class="table">
-                            <thead>
+                            <thead class="bg-primary">
+                                <h4>Agregados</h4>
                                 <tr>
                                     <th scope="col" class="p-1">Fecha</th>
                                     <th scope="col" class="p-1">Proveedor</th>
@@ -92,7 +52,8 @@
                                     <th scope="col" class="p-1">Material</th>
                                     <th scope="col" class="p-1">Volumen(m3)</th>
                                     <th scope="col" class="p-1">Peso(Tn)</th>
-                                    <th scope="col" class="p-1">Costo</th>
+                                    <th scope="col" class="p-1">Precio Uni.</th>
+                                    <th scope="col" class="p-1">Total</th>
                                     <th scope="col" class="p-1">Pagar</th>
                                 </tr>
                             </thead>
@@ -100,9 +61,35 @@
 
                             </tbody>
                         </table>
+                        <table class="table">
+                            <thead class="bg-primary">
+                                <h4>Fletes</h4>
+                                <tr>
+                                    <th scope="col" class="p-1">Fecha</th>
+                                    <th scope="col" class="p-1">Proveedor</th>
+                                    <th scope="col" class="p-1">Chofer</th>
+                                    <th scope="col" class="p-1">N° de Control</th>
+                                    <th scope="col" class="p-1">Material</th>
+                                    <th scope="col" class="p-1">Volumen(m3)</th>
+                                    <th scope="col" class="p-1">Peso(Tn)</th>
+                                    <th scope="col" class="p-1">Precio Uni.</th>
+                                    <th scope="col" class="p-1">Total</th>
+                                    <th scope="col" class="p-1">Pagar</th>
+                                </tr>
+                            </thead>
+                            <tbody id="txt2">
+
+                            </tbody>
+                        </table>
+                        <h2 class="text-center">--------------------------------------------------------</h2>
+                        <div id="total">
+
+                        </div>
+                        <h2 class="text-center">--------------------------------------------------------</h2>
                     </div>
                     <div class="row">
-                        <input class="btn btn-warning col mr-1 ml-3" type="button" onclick="printDiv('areaImprimir')" value="imprimir div" />
+                        <input class="btn btn-warning col mr-1 ml-3" type="button" onclick="printDiv('areaImprimir')"
+                            value="imprimir div" />
                         <button class="btn btn-primary btn-block col ml-1 mr-3" onclick="pagar()">Pagar</button>
                     </div>
                 </div>
@@ -118,28 +105,43 @@
             <script>
 
                 const txt = document.querySelector('#txt');
+                const txt2 = document.querySelector('#txt2');
+                const total = document.querySelector('#total');
                 const txtBuscar = document.querySelector('#txtBuscar');
                 const paginas = document.querySelector('#paginas');
+                let totalGlobal = 0;
                 const { ipcRenderer } = require('electron');
 
                 let listaDatos = [];
+                let listaFlete = [];
                 let listaModificar = [];
+                let listaModificarFlete = [];
 
                 load();
 
                 function load() {
                     let sql = '';
-                    sql = 'select * from electron_crud.materiales where fecha between "2019-01-01" and "3000-01-01" and Material = "granza" and pagado = 0 order by proveedor asc;';
-
+                    //sql = 'select * from electron_crud.materiales where fecha between "2019-01-01" and "3000-01-01" and Material = "granza" and pagado = 0 order by proveedor asc;';
+                    sql = 'select * from electron_crud.materiales where fecha between "2019-01-01" and "3000-01-01" and pagadom = 0 order by  material, proveedor;'
                     ipcRenderer.send('encontrar', sql);
 
                     ipcRenderer.on('encontro', (e, datos) => {
                         let nombreAnterior = datos[0].proveedor;
+                        let materialAnterior = datos[0].material;
                         let volumenValor = 0;
                         let pesoValor = 0;
                         let precioValor = 0;
+
+                        txt.innerHTML += `<tr><b><th>${materialAnterior}</th></b></tr>`
                         txt.innerHTML += `<tr><th>${nombreAnterior}</th></tr>`
                         for (var i = 0; i < datos.length; i++) {
+                            if (datos[i].m3 == '0') {
+                                datos[i].tn = datos[i].tn - datos[i].factorp
+                            }
+                            if (datos[i].tn == '0') {
+                                datos[i].m3 = datos[i].m3 - datos[i].factorp
+                            }
+                            console.log(datos[i].factorp)
                             if (nombreAnterior != datos[i].proveedor) {
                                 txt.innerHTML += `
                                     <td class="p-1"></td>
@@ -148,8 +150,15 @@
                                     <td class="p-1"></td>
                                     <td class="p-1"></td>
                                     <td class="p-1"><b>${volumenValor}</b></td>
-                                    <td class="p-1"><b>${pesoValor}</b></td>
+                                    <td class="p-1"><b>${pesoValor.toFixed(2)}</b></td>
+                                    <td class="p-1"></td>
                                     <td class="p-1"><b>${precioValor}Bs</b></td>
+                                    `;
+                                totalGlobal += precioValor;
+                                if (materialAnterior != datos[i].material) {
+                                    txt.innerHTML += `<tr><b><th>${datos[i].material}</th></b></tr>`
+                                }
+                                txt.innerHTML += `
                                     <tr><th>${datos[i].proveedor}</th></b></tr>
                                     <tr>
                                         <td class="p-1">${datos[i].fecha}</td>
@@ -159,6 +168,7 @@
                                         <td class="p-1">${datos[i].material}</td>
                                         <td class="p-1">${datos[i].m3}</td>
                                         <td class="p-1">${datos[i].tn}</td>
+                                        <td class="p-1">${datos[i].preciom}Bs</td>
                                         <td class="p-1">${datos[i].preciom * datos[i].m3 + (datos[i].preciom * datos[i].tn)}Bs</td>
                                         <td class="p-1"><div class="form-group form-check">
                                             <input type="checkbox" class="form-check-input" id="${datos[i].Id}">
@@ -166,6 +176,7 @@
                                      </tr>`;
                                 listaDatos.push(datos[i].Id)
                                 nombreAnterior = datos[i].proveedor
+                                materialAnterior = datos[i].material
                                 volumenValor = datos[i].m3
                                 pesoValor = datos[i].tn
                                 precioValor = datos[i].preciom * datos[i].m3 + (datos[i].preciom * datos[i].tn)
@@ -179,6 +190,7 @@
                                         <td class="p-1">${datos[i].material}</td>
                                         <td class="p-1">${datos[i].m3}</td>
                                         <td class="p-1">${datos[i].tn}</td>
+                                        <td class="p-1">${datos[i].preciom}Bs</td>
                                         <td class="p-1">${datos[i].preciom * datos[i].m3 + (datos[i].preciom * datos[i].tn)}Bs</td>
                                         <td class="p-1"><div class="form-group form-check">
                                             <input type="checkbox" class="form-check-input" id="${datos[i].Id}">
@@ -190,8 +202,7 @@
                                 pesoValor += datos[i].tn
                                 precioValor += datos[i].preciom * datos[i].m3 + (datos[i].preciom * datos[i].tn)
                             }
-
-                        }
+                    }
                         txt.innerHTML += `
                                     <td class="p-1"></td>
                                     <td class="p-1"></td>
@@ -199,25 +210,160 @@
                                     <td class="p-1"></td>
                                     <td class="p-1"></td>
                                     <td class="p-1"><b>${volumenValor}</b></td>
-                                    <td class="p-1"><b>${pesoValor}</b></td>
+                                    <td class="p-1"><b>${pesoValor.toFixed(2)}</b></td>
+                                    <td class="p-1"></td>
                                     <td class="p-1"><b>${precioValor}Bs</b></td>
                                     `
+                        totalGlobal += precioValor;
                         console.log(listaDatos)
+                    })
+                    //--------------------------------------------------------------------------------------------------------------
+
+                    sql = 'select * from electron_crud.materiales where fecha between "2019-01-01" and "3000-01-01" and chofer != "-" and pagadof = 0 order by  material, chofer;'
+                    ipcRenderer.send('encontrar2', sql);
+
+                    ipcRenderer.on('encontro2', (e, datos) => {
+                        console.log(datos.length)
+
+
+                        if (datos.length == 0) {
+                            total.innerHTML += `
+                                    <h5 class="text-center">TOTAL GLOBAL = ${totalGlobal}Bs</h5>
+                                    `
+                        } else {
+                            let nombreAnterior = datos[0].chofer;
+                            let materialAnterior = datos[0].material;
+                            let volumenValor = 0;
+                            let pesoValor = 0;
+                            let precioValor = 0;
+
+                            txt2.innerHTML += `<tr><b><th>${materialAnterior}</th></b></tr>`
+                            txt2.innerHTML += `<tr><th>${nombreAnterior}</th></tr>`
+                            for (var i = 0; i < datos.length; i++) {
+                                if (datos[i].m3 == '0') {
+                                    datos[i].tn = datos[i].tn - datos[i].factorf
+                                }
+                                if (datos[i].tn == '0') {
+                                    datos[i].m3 = datos[i].m3 - datos[i].factorf
+                                }
+                                if(datos[i].material == 'Cemento'){
+                                    datos[i].m3 = 1;
+                                    datos[i].tn = 0;
+                                }
+                                if (nombreAnterior != datos[i].chofer) {
+                                    txt2.innerHTML += `
+                                    <td class="p-1"></td>
+                                    <td class="p-1"></td>
+                                    <td class="p-1"></td>
+                                    <td class="p-1"></td>
+                                    <td class="p-1"></td>
+                                    <td class="p-1"><b>${volumenValor}</b></td>
+                                    <td class="p-1"><b>${pesoValor.toFixed(2)}</b></td>
+                                    <td class="p-1"></td>
+                                    <td class="p-1"><b>${precioValor}Bs</b></td>
+                                    `;
+                                    totalGlobal += precioValor;
+                                    if (materialAnterior != datos[i].material) {
+                                        txt2.innerHTML += `<tr><b><th>${datos[i].material}</th></b></tr>`
+                                    }
+                                    txt2.innerHTML += `
+                                    <tr><th>${datos[i].chofer}</th></b></tr>
+                                    <tr>
+                                        <td class="p-1">${datos[i].fecha}</td>
+                                        <td class="p-1">${datos[i].proveedor}</td>
+                                        <td class="p-1">${datos[i].chofer}</td>
+                                        <td class="p-1">${datos[i].control}</td>
+                                        <td class="p-1">${datos[i].material}</td>
+                                        <td class="p-1">${datos[i].m3}</td>
+                                        <td class="p-1">${datos[i].tn}</td>
+                                        <td class="p-1">${datos[i].preciof}Bs</td>
+                                        <td class="p-1">${datos[i].preciof * datos[i].m3 + (datos[i].preciof * datos[i].tn)}Bs</td>
+                                        <td class="p-1"><div class="form-group form-check">
+                                            <input type="checkbox" class="form-check-input" id="f${datos[i].Id}">
+                                        </div></td>
+                                     </tr>`;
+                                    listaFlete.push(datos[i].Id)
+                                    nombreAnterior = datos[i].proveedor
+                                    materialAnterior = datos[i].material
+                                    volumenValor = datos[i].m3
+                                    pesoValor = datos[i].tn
+                                    precioValor = datos[i].preciom * datos[i].m3 + (datos[i].preciom * datos[i].tn)
+                                } else {
+                                    txt2.innerHTML += `
+                                    <tr>
+                                        <td class="p-1">${datos[i].fecha}</td>
+                                        <td class="p-1">${datos[i].proveedor}</td>
+                                        <td class="p-1">${datos[i].chofer}</td>
+                                        <td class="p-1">${datos[i].control}</td>
+                                        <td class="p-1">${datos[i].material}</td>
+                                        <td class="p-1">${datos[i].m3}</td>
+                                        <td class="p-1">${datos[i].tn}</td>
+                                        <td class="p-1">${datos[i].preciof}Bs</td>
+                                        <td class="p-1">${datos[i].preciof * datos[i].m3 + (datos[i].preciof * datos[i].tn)}Bs</td>
+                                        <td class="p-1"><div class="form-group form-check">
+                                            <input type="checkbox" class="form-check-input" id="f${datos[i].Id}">
+                                        </div></td>
+                                    </tr>`;
+                                    listaFlete.push(datos[i].Id)
+                                    nombreAnterior = datos[i].chofer
+                                    volumenValor += datos[i].m3
+                                    pesoValor += datos[i].tn
+                                    precioValor += datos[i].preciof * datos[i].m3 + (datos[i].preciof * datos[i].tn)
+                                }
+
+                            }
+                            txt2.innerHTML += `
+                                    <td class="p-1"></td>
+                                    <td class="p-1"></td>
+                                    <td class="p-1"></td>
+                                    <td class="p-1"></td>
+                                    <td class="p-1"></td>
+                                    <td class="p-1"><b>${volumenValor}</b></td>
+                                    <td class="p-1"><b>${pesoValor.toFixed(2)}</b></td>
+                                    <td class="p-1"></td>
+                                    <td class="p-1"><b>${precioValor}Bs</b></td>
+                                    `
+                            totalGlobal += precioValor;
+                            total.innerHTML += `
+                                    <h5 class="text-center">TOTAL GLOBAL = ${totalGlobal}Bs</h5>
+                                    `
+                            console.log(listaFlete)
+                            console.log(totalGlobal)
+                        }
                     })
                 }
 
 
                 function pagar() {
+                    console.log('Lista datos ' + listaDatos);
                     for (var i = 0; i < listaDatos.length; i++) {
+                        console.log('ESTE NO WEON!! ' + listaModificar)
                         var isChecked = document.getElementById(listaDatos[i]).checked;
                         if (isChecked) {
                             listaModificar.push(listaDatos[i])
+
                         }
                     }
-                    console.log(listaModificar);
+                    console.log('Lista Flete ' + listaFlete);
+                    for (var i = 0; i < listaFlete.length; i++) {
+                        console.log('ESTE WEON!! ' + listaModificarFlete);
+                        var isChecked2 = document.getElementById('f' + listaFlete[i]).checked;
+                        if (isChecked2) {
+                            listaModificarFlete.push(listaFlete[i])
+
+                        }
+                    }
+
                     for (var i = 0; i < listaModificar.length; i++) {
-                        sql = 'UPDATE electron_crud.materiales SET pagado = 1 WHERE Id = ' + listaModificar[i] + ';'
-                    ipcRenderer.send('actualizar', sql);
+                        sql = 'UPDATE electron_crud.materiales SET pagadom = 1 WHERE Id = ' + listaModificar[i] + ';'
+                        console.log('Procesando Proveedor ' + listaModificar);
+                        ipcRenderer.send('actualizar', sql);
+                    }
+
+                    for (var i = 0; i < listaModificarFlete.length; i++) {
+                        sql = 'UPDATE electron_crud.materiales SET pagadof = 1 WHERE Id = ' + listaModificarFlete[i] + ';'
+                        console.log('Procesando Flete ' + listaModificarFlete);
+                        ipcRenderer.send('actualizar', sql);
                     }
                     //load();
                     location.reload();

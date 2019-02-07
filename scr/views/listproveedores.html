@@ -95,6 +95,7 @@
                                     <th scope="col" class="p-1">Cedula o RIF</th>
                                     <th scope="col" class="p-1">Material</th>
                                     <th scope="col" class="p-1">Precio</th>
+                                    <th scope="col" class="p-1">Factor R.</th>
                                     <th scope="col" class="p-1">Accion</th>
                                 </tr>
                             </thead>
@@ -154,6 +155,7 @@
                         <td id="cedulaRif${datos[i].Id}" class="p-1">${datos[i].rif}</td>
                         <td id="materialProveedor${datos[i].Id}" class="p-1">${datos[i].Material}</td>
                         <td id="precioProveedor${datos[i].Id}" class="p-1">${datos[i].precio}</td>
+                        <td id="precioProveedor${datos[i].Id}" class="p-1">${datos[i].factor}</td>
                         <td class="p-1"><button onclick="modificar(${datos[i].Id})" class="btn btn-success btn-sm m-0">Modificar</button>
                         <button onclick="borrar(${datos[i].Id})" class="btn btn-danger btn-sm m-0">Borrar</button></td>
                         </tr>`;

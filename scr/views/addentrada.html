@@ -112,7 +112,7 @@
 
     const form = document.querySelector('#form');
     form.addEventListener('submit', (e) => {
-        //e.preventDefault();
+        e.preventDefault();
         guardar();
     });
 
@@ -145,19 +145,25 @@
         const chofer = document.querySelector('#txtChofer').value;
         const nControl = document.querySelector('#nControl').value;
         const cantidad = document.querySelector('#Cantidad').value;
+        let guardado = 0;
         var precioMaterial = "";
         var precioFlete = "";
 
-        const sql = 'SELECT(SELECT precio  FROM electron_crud.proveedores WHERE nombre = "' + proveedor + '" AND Material = "' + agregado + '") AS proveedor, (SELECT precio  FROM electron_crud.proveedores WHERE nombre = "' + chofer + '" AND Material = "flete") AS flete;';
+        const sql = 'SELECT(SELECT precio  FROM electron_crud.proveedores WHERE nombre = "' + proveedor + '" AND Material = "' + agregado + '") AS proveedor, (SELECT precio  FROM electron_crud.proveedores WHERE nombre = "' + chofer + '" AND Material = "flete") AS flete, (SELECT factor  FROM electron_crud.proveedores WHERE nombre = "' + proveedor + '" AND Material = "' + agregado + '") AS factorp, (SELECT factor  FROM electron_crud.proveedores WHERE nombre = "' + chofer + '" AND Material = "flete") AS factorf;';
 
         ipcRenderer.send('encontrar', sql);
 
         ipcRenderer.on('encontro', (e, datos) => {
             precioMaterial = datos[0].proveedor
             precioFlete = datos[0].flete
-            if (precioMaterial == null){
-                alert('El proveedor indicado no posee un precio establecido para este agregado!')
-                return
+            factorMaterial = datos[0].factorp
+            factorFlete = datos[0].factorf
+            if (precioMaterial == null) {
+                guardado = 1;
+                //alert('El proveedor indicado no posee un precio establecido para este agregado!')
+                if (alert("El proveedor indicado no posee un precio establecido para este agregado!")) {
+                    form.reset()    
+                }
             }
             console.log('1= ' + precioMaterial);
             console.log('1= ' + precioFlete);
@@ -175,11 +181,13 @@
                     material: agregado,
                     m3: cantidad,
                     preciom: precioMaterial,
-                    preciof: precioFlete
+                    preciof: precioFlete,
+                    factorp: factorMaterial,
+                    factorf: factorFlete
                 };
             }
 
-            else {
+            if (document.querySelector('#optionTn').checked) {
                 console.log('check 2')
                 datos = {
                     fecha: fecha,
@@ -189,19 +197,30 @@
                     material: agregado,
                     tn: cantidad,
                     preciom: precioMaterial,
-                    preciof: precioFlete
+                    preciof: precioFlete,
+                    factorp: factorMaterial,
+                    factorf: factorFlete
                 };
             }
+
+            /*if (fecha == '') {
+                guardado = 1;
+                if (alert("Valor de fecha no ingresado!")) {
+                    form.reset()
+                }
+            }*/
 
             console.log(precioMaterial);
             console.log(precioFlete);
 
+
             console.log('datos length =' + datos.length);
             const tabla = 'materiales'
 
-            ipcRenderer.send('guardar', datos, tabla);
-            form.reset()
-
+            if (guardado == 0) {
+                ipcRenderer.send('guardar', datos, tabla);
+                form.reset()
+            }
         });
     };
 
