@@ -140,8 +140,8 @@
 
                 function load() {
                     let sql = '';
-                    //sql = 'select * from electron_crud.materiales where fecha between "2019-01-01" and "3000-01-01" and Material = "granza" and pagado = 0 order by proveedor asc;';
-                    sql = 'select * from electron_crud.materiales where fecha between "2019-01-01" and "3000-01-01" and pagadom = 0 order by  material, proveedor;'
+                    //sql = 'select * from materiales where fecha between "2019-01-01" and "3000-01-01" and Material = "granza" and pagado = 0 order by proveedor asc;';
+                    sql = 'select * from materiales where fecha between "2019-01-01" and "3000-01-01" and pagadom = 0 order by  material, proveedor;'
                     ipcRenderer.send('encontrar', sql);
 
                     ipcRenderer.on('encontro', (e, datos) => {
@@ -238,7 +238,7 @@
                     })
                     //--------------------------------------------------------------------------------------------------------------
 
-                    sql = 'select * from electron_crud.materiales where fecha between "2019-01-01" and "3000-01-01" and chofer != "-" and pagadof = 0 order by  material, chofer;'
+                    sql = 'select * from materiales where fecha between "2019-01-01" and "3000-01-01" and chofer != "-" and pagadof = 0 order by  material, chofer;'
                     ipcRenderer.send('encontrar2', sql);
 
                     ipcRenderer.on('encontro2', (e, datos) => {
@@ -352,7 +352,7 @@
                         }
                     })
                     //-----------------------------------------FACTURAS-----------------------------------------------------------
-                    sql = 'SELECT * FROM electron_crud.facturas;'
+                    sql = 'SELECT * FROM facturas;'
                     ipcRenderer.send('encontrar3', sql);
 
                     ipcRenderer.on('encontro3', (e, datos) => {
@@ -418,13 +418,13 @@
                     }
 
                     for (var i = 0; i < listaModificar.length; i++) {
-                        sql = 'UPDATE electron_crud.materiales SET pagadom = 1 WHERE Id = ' + listaModificar[i] + ';'
+                        sql = 'UPDATE materiales SET pagadom = 1 WHERE Id = ' + listaModificar[i] + ';'
                         console.log('Procesando Proveedor ' + listaModificar);
                         ipcRenderer.send('actualizar', sql);
                     }
 
                     for (var i = 0; i < listaModificarFlete.length; i++) {
-                        sql = 'UPDATE electron_crud.materiales SET pagadof = 1 WHERE Id = ' + listaModificarFlete[i] + ';'
+                        sql = 'UPDATE materiales SET pagadof = 1 WHERE Id = ' + listaModificarFlete[i] + ';'
                         console.log('Procesando Flete ' + listaModificarFlete);
                         ipcRenderer.send('actualizar', sql);
                     }

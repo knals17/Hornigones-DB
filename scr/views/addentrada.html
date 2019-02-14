@@ -149,7 +149,7 @@
         var precioMaterial = "";
         var precioFlete = "";
 
-        const sql = 'SELECT(SELECT precio  FROM electron_crud.proveedores WHERE nombre = "' + proveedor + '" AND Material = "' + agregado + '") AS proveedor, (SELECT precio  FROM electron_crud.proveedores WHERE nombre = "' + chofer + '" AND Material = "flete") AS flete, (SELECT factor  FROM electron_crud.proveedores WHERE nombre = "' + proveedor + '" AND Material = "' + agregado + '") AS factorp, (SELECT factor  FROM electron_crud.proveedores WHERE nombre = "' + chofer + '" AND Material = "flete") AS factorf;';
+        const sql = 'SELECT(SELECT precio  FROM proveedores WHERE nombre = "' + proveedor + '" AND Material = "' + agregado + '") AS proveedor, (SELECT precio  FROM proveedores WHERE nombre = "' + chofer + '" AND Material = "flete") AS flete, (SELECT factor  FROM proveedores WHERE nombre = "' + proveedor + '" AND Material = "' + agregado + '") AS factorp, (SELECT factor  FROM proveedores WHERE nombre = "' + chofer + '" AND Material = "flete") AS factorf;';
 
         ipcRenderer.send('encontrar', sql);
 
@@ -224,7 +224,7 @@
         });
     };
 
-//SELECT fecha, proveedor, sum(m3) as m3, sum(tn) FROM electron_crud.materiales WHERE fecha BETWEEN '2018-12-1' and '3019-1-1' GROUP BY proveedor ORDER BY proveedor ASC; 
+//SELECT fecha, proveedor, sum(m3) as m3, sum(tn) FROM materiales WHERE fecha BETWEEN '2018-12-1' and '3019-1-1' GROUP BY proveedor ORDER BY proveedor ASC; 
 
 </script>
 

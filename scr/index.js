@@ -11,11 +11,11 @@ if (process.env.NODE_ENV !== "production") {
 let mainWindow = null;
 
 const conexion = mysql.createConnection({
-    host: 'localhost',
+    host: 'bb2dt2v1qqbja6guf044-mysql.services.clever-cloud.com', //'localhost',
     port: '3306',
-    user: 'root',
-    password: 'luiscanalest',
-    database: 'electron_crud'
+    user: 'udoazxjxm8u7xpidmrrh',//'root',
+    password: 'VT5iT1MvDYWHF2ZhzMfx', //'luiscanalest',
+    database: 'bb2dt2v1qqbja6guf044'//'electron_crud'
 })
 
 conexion.connect((err) => {
@@ -39,7 +39,7 @@ function enviarDatos() {
         mainWindow.webContents.send('carga', datos);
 
     });
-    query = 'SELECT DISTINCT cliente FROM electron_crud.despachohs ORDER BY cliente ASC';
+    query = 'SELECT DISTINCT cliente FROM despachohs ORDER BY cliente ASC';
     conexion.query(query, (err, row) => {
         if (err) {
             console.log('Hubo un error: ');
@@ -51,7 +51,7 @@ function enviarDatos() {
 
     });
 
-    query = 'SELECT DISTINCT proveedor FROM electron_crud.materiales ORDER BY proveedor ASC';
+    query = 'SELECT DISTINCT proveedor FROM materiales ORDER BY proveedor ASC';
     conexion.query(query, (err, row) => {
         if (err) {
             console.log('Hubo un error: ');
@@ -62,7 +62,7 @@ function enviarDatos() {
         mainWindow.webContents.send('carga3', proveedor);
 
     });
-    query = 'SELECT DISTINCT nombre FROM electron_crud.proveedores ORDER BY nombre ASC';
+    query = 'SELECT DISTINCT nombre FROM proveedores ORDER BY nombre ASC';
     conexion.query(query, (err, row) => {
         if (err) {
             console.log('Hubo un error: ');
@@ -74,7 +74,7 @@ function enviarDatos() {
 
 
     });
-    query = 'SELECT DISTINCT nombre FROM electron_crud.proveedores WHERE Material = "flete" ORDER BY nombre ASC';
+    query = 'SELECT DISTINCT nombre FROM proveedores WHERE Material = "flete" ORDER BY nombre ASC';
     conexion.query(query, (err, row) => {
         if (err) {
             console.log('Hubo un error: ');
