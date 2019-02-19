@@ -10,25 +10,32 @@ if (process.env.NODE_ENV !== "production") {
 
 let mainWindow = null;
 
-const conexion = mysql.createConnection({
-    host: 'bb2dt2v1qqbja6guf044-mysql.services.clever-cloud.com', //'localhost',
-    port: '3306',
-    user: 'udoazxjxm8u7xpidmrrh',//'root',
-    password: 'VT5iT1MvDYWHF2ZhzMfx', //'luiscanalest',
-    database: 'bb2dt2v1qqbja6guf044'//'electron_crud'
-})
+//conectar();
 
-conexion.connect((err) => {
-    if (err) {
-        console.log(err.code);
-        console.log(err.fatal);
-    }
-});
+//function conectar() {
+    const conexion = mysql.createConnection({
+        host: 'bb2dt2v1qqbja6guf044-mysql.services.clever-cloud.com', //'localhost',
+        port: '3306',
+        user: 'udoazxjxm8u7xpidmrrh',//'root',
+        password: 'VT5iT1MvDYWHF2ZhzMfx', //'luiscanalest',
+        database: 'bb2dt2v1qqbja6guf044'//'electron_crud'
+    })
+
+    conexion.connect((err) => {
+        if (err) {
+            console.log(err.code);
+            console.log(err.fatal);
+        }else{
+            console.log('Conectado a BD')
+        }
+    });
+//}
+
 
 let query = 'SELECT * FROM despachohs LIMIT 50 ';
 
 function enviarDatos() {
-    let datos = [] 
+    let datos = []
     conexion.query(query, (err, row) => {
         if (err) {
             console.log('Hubo un error: ');
@@ -148,7 +155,7 @@ ipcMain.on('guardar', (e, datos, tabla) => {
             return;
         }
         console.log('Guardado!');
-        if (tabla == 'despachohs'){
+        if (tabla == 'despachohs') {
             enviarDatos();
         }
     });
@@ -218,7 +225,7 @@ ipcMain.on('filtrar', (e, sql, sqlCuenta) => {
         }
         let datos = row;
         mainWindow.webContents.send('cuenta', datos);
-    
+
         console.log('Cuenta!');
         console.log('*******************************');
         console.log(datos[0]);
@@ -227,68 +234,78 @@ ipcMain.on('filtrar', (e, sql, sqlCuenta) => {
 });
 
 ipcMain.on('pagina', (e, sql) => {
-        let query = sql;
-        console.log('SQL = ' + query);
-        conexion.query(query,(err, row) => {
-            if (err) {
-                console.log('Hubo un error: ');
-                console.log(err);
-                return;
-            }
-            console.log('******************************');
-            console.log('Paginas Cargadas');
-            console.log('------------------------------');
-            mainWindow.webContents.send('paginacarga', row);
-        });
+    let query = sql;
+    console.log('SQL = ' + query);
+    conexion.query(query, (err, row) => {
+        if (err) {
+            console.log('Hubo un error: ');
+            console.log(err);
+            return;
+        }
+        console.log('******************************');
+        console.log('Paginas Cargadas');
+        console.log('------------------------------');
+        mainWindow.webContents.send('paginacarga', row);
+    });
 });
 
 ipcMain.on('encontrar', (e, sql) => {
     console.log('Procesando = ' + sql);
-        let query = sql;
-        conexion.query(query, (err, row) => {
-            if (err) {
-                console.log('Hubo un error: ');
-                console.log(err);
-                return;
-            }
-            console.log('Busqueda Completada!');
-            //console.log(row);
-            //console.log('------------------------------');
-            mainWindow.webContents.send('encontro', row);
-        });
+    let query = sql;
+    conexion.query(query, (err, row) => {
+        if (err) {
+            console.log('Hubo un error: ');
+            console.log(err);
+            return;
+        }
+        console.log('Busqueda Completada!');
+        //console.log(row);
+        //console.log('------------------------------');
+        mainWindow.webContents.send('encontro', row);
+    });
 });
 
 ipcMain.on('encontrar2', (e, sql) => {
     console.log('Procesando = ' + sql);
-        let query = sql;
-        conexion.query(query, (err, row) => {
-            if (err) {
-                console.log('Hubo un error: ');
-                console.log(err);
-                return;
-            }
-            console.log('Busqueda Completada!');
-            //console.log(row);
-            //console.log('------------------------------');
-            mainWindow.webContents.send('encontro2', row);
-        });
+    let query = sql;
+    conexion.query(query, (err, row) => {
+        if (err) {
+            console.log('Hubo un error: ');
+            console.log(err);
+            return;
+        }
+        console.log('Busqueda Completada!');
+        //console.log(row);
+        //console.log('------------------------------');
+        mainWindow.webContents.send('encontro2', row);
+    });
 });
 
 ipcMain.on('encontrar3', (e, sql) => {
     console.log('Procesando = ' + sql);
-        let query = sql;
-        conexion.query(query, (err, row) => {
-            if (err) {
-                console.log('Hubo un error: ');
-                console.log(err);
-                return;
-            }
-            console.log('Busqueda Completada!');
-            //console.log(row);
-            //console.log('------------------------------');
-            mainWindow.webContents.send('encontro3', row);
-        });
+    let query = sql;
+    conexion.query(query, (err, row) => {
+        if (err) {
+            console.log('Hubo un error: ');
+            console.log(err);
+            return;
+        }
+        console.log('Busqueda Completada!');
+        //console.log(row);
+        //console.log('------------------------------');
+        mainWindow.webContents.send('encontro3', row);
+    });
 });
+
+setInterval(conexion.query('SELECT max(ticket) as ultTicket  FROM bb2dt2v1qqbja6guf044.despachohs;', (err, row) => {
+    if (err) {
+        console.log('Hubo un error: ');
+        console.log(err);
+        return;
+    }
+    console.log('async');
+    let datos = row;
+}), 10000);
 
 
 

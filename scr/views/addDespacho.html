@@ -8,6 +8,10 @@
 
     <link rel="stylesheet" href="https://bootswatch.com/4/superhero/bootstrap.min.css" crossorigin="anonymous">
 
+
+    <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+
     <title>Document</title>
 
 </head>
@@ -16,20 +20,21 @@
     <div class="container-fluid">
         <ul class="nav bg-secondary mt-2">
             <li class="nav-item">
-                    <a href=""><button class="nav-link btn btn-primary">Dashboard</button></a>
-                  </li>
-            <li class="nav-item">
-              <a href="index.html"><button class="nav-link btn btn-primary active">Consulta Clientes</button></a>
+                <a href=""><button class="nav-link btn btn-primary">Dashboard</button></a>
             </li>
             <li class="nav-item">
-                    <a href="proveedores.html"><button class="nav-link btn btn-primary">Consulta Proveedores</button></a>
-                </li>
-            <li class="nav-item">
-              <a href=""><button class="nav-link btn btn-primary" tabindex="-1" aria-disabled="true">Disabled</button></a>
+                <a href="index.html"><button class="nav-link btn btn-primary active">Consulta Clientes</button></a>
             </li>
-          </ul>
+            <li class="nav-item">
+                <a href="proveedores.html"><button class="nav-link btn btn-primary">Consulta Proveedores</button></a>
+            </li>
+            <li class="nav-item">
+                <a href=""><button class="nav-link btn btn-primary" tabindex="-1"
+                        aria-disabled="true">Disabled</button></a>
+            </li>
+        </ul>
 
-        <div class="col-md-4">
+        <div class="col mt-3">
             <div class="card p-2">
                 <div class="p-2">
                     <h2 class="text-center">Agregar Datos</h2>
@@ -37,28 +42,77 @@
 
                 <div class="m-2">
                     <form id="form" class="m-1">
-                        <div class="form-group">
-                            <input class="form-control" type="date" id="fecha">
+                        <div class="row">
+                            <div class="col">
+                                <div class="form-group">
+                                    <label for="exampleFormControlSelect1">Fecha</label>
+                                    <input class="form-control" type="date" id="fecha">
+                                </div>
+                                <div class="form-group">
+                                    <label for="exampleFormControlSelect1">Cliente</label>
+                                    <input class="form-control" type="text" id="cliente" placeholder="Cliente">
+                                </div>
+                                <div class="form-group">
+                                    <label for="exampleFormControlSelect1">Direccion</label>
+                                    <input class="form-control" type="text" id="direccion" placeholder="Direccion">
+                                </div>
+                                <div class="form-group">
+                                    <label for="exampleFormControlSelect1">N de Ticket</label>
+                                    <input class="form-control" type="text" id="ticket" placeholder="Ticket">
+                                </div>
+                            </div>
+                            <div class="col">
+                                <div class="form-group">
+                                    <label for="exampleFormControlSelect1">Resistencia</label>
+                                    <select id="resistencia" class="form-control form-control-sm">
+                                        <option>AC</option>
+                                        <option>180</option>
+                                        <option>180F</option>
+                                        <option>180H</option>
+                                        <option>210</option>
+                                        <option>210F</option>
+                                        <option>210H</option>
+                                        <option>250</option>
+                                        <option>250F</option>
+                                        <option>250H</option>
+                                        <option>280</option>
+                                        <option>280F</option>
+                                        <option>280H</option>
+                                        <option>300</option>
+                                        <option>300F</option>
+                                        <option>300H</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="exampleFormControlSelect1">volumen</label>
+                                    <select id="volumen" class="form-control form-control-sm">
+                                        <option>-</option>
+                                        <option>0.0</option>
+                                        <option>0.5</option>
+                                        <option>1.0</option>
+                                        <option>1.5</option>
+                                        <option>2.0</option>
+                                        <option>2.5</option>
+                                        <option>3.0</option>
+                                        <option>3.5</option>
+                                        <option>4.0</option>
+                                        <option>4.5</option>
+                                        <option>5.0</option>
+                                        <option>5.5</option>
+                                        <option>6.0</option>
+                                        <option>6.5</option>
+                                        <option>7.0</option>
+                                        <option>7.5</option>
+                                        <option>8.0</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="exampleFormControlSelect1">Camion</label>
+                                    <input class="form-control" type="text" id="unidad" placeholder="Unidad">
+                                </div>
+                            </div>
                         </div>
-                        <div class="form-group">
-                            <input class="form-control" type="text" id="cliente" placeholder="Cliente">
-                        </div>
-                        <div class="form-group">
-                            <input class="form-control" type="text" id="direccion" placeholder="Direccion">
-                        </div>
-                        <div class="form-group">
-                            <input class="form-control" type="text" id="ticket" placeholder="Ticket">
-                        </div>
-                        <div class="form-group">
-                            <input class="form-control" type="text" id="resistencia" placeholder="Resistencia">
-                        </div>
-                        <div class="form-group">
-                            <input class="form-control" type="text" id="volumen" placeholder="Volumen">
-                        </div>
-                        <div class="form-group">
-                            <input class="form-control" type="text" id="unidad" placeholder="Unidad">
-                        </div>
-                        <button class="btn btn-success btn-sm">Guardar</button>
+                        <button class="btn btn-block btn-success">Guardar</button>
                     </form>
                 </div>
             </div>
@@ -72,8 +126,31 @@
 </body>
 
 <script>
+    //-------------------------------------------AUTOCOMPLETE-----------------------------------------------
+    var availableTags = [];
+    $(function () {
+        ipcRenderer.on('carga2', (e, buscardata) => {
+            console.log(buscardata)
+            availableTags = buscardata;
+                });
+        $("#cliente").autocomplete({
+            source: availableTags
+        });
+    });
+
+
+
+    //------------------------------------------------------------------------------------------------------
     const { ipcRenderer } = require('electron');
-    
+
+    let fecha = document.querySelector('#fecha').value;
+    let cliente = document.querySelector('#cliente').value;
+    let direccion = document.querySelector('#direccion').value;
+    let ticket = document.querySelector('#ticket');
+    let resistencia = document.querySelector('#resistencia').value;
+    let volumen = document.querySelector('#volumen').value;
+    let unidad = document.querySelector('#unidad').value;
+
     const form = document.querySelector('#form');
     form.addEventListener('submit', (e) => {
         e.preventDefault();
@@ -81,33 +158,41 @@
     });
 
 
+    let sql = 'SELECT max(ticket) as ultTicket  FROM bb2dt2v1qqbja6guf044.despachohs;'
+    ipcRenderer.send('encontrar2', sql);
+
+    ipcRenderer.on('encontro2', (e, datos) => {
+        console.log(datos[0].ultTicket)
+        ticket.value = datos[0].ultTicket + 1
+    })
+
+
     function guardar() {
+        let fecha = document.querySelector('#fecha').value;
+        let cliente = document.querySelector('#cliente').value;
+        let direccion = document.querySelector('#direccion').value;
+        let ticket = document.querySelector('#ticket');
+        let resistencia = document.querySelector('#resistencia').value;
+        let volumen = document.querySelector('#volumen').value;
+        let unidad = document.querySelector('#unidad').value;
 
-const fecha = document.querySelector('#fecha').value;
-const cliente = document.querySelector('#cliente').value;
-const direccion = document.querySelector('#direccion').value;
-const ticket = document.querySelector('#ticket').value;
-const resistencia = document.querySelector('#resistencia').value;
-const volumen = document.querySelector('#volumen').value;
-const unidad = document.querySelector('#unidad').value;
+        const datos = {
+            fecha: fecha,
+            cliente: cliente,
+            direccion: direccion,
+            ticket: ticket.value,
+            resistencia: resistencia,
+            volumen: volumen,
+            unidad: unidad
+        };
 
+        console.log('datos length =' + datos.length);
+        const tabla = 'despachohs'
 
-const datos = {
-    fecha: fecha,
-    cliente: cliente,
-    direccion: direccion,
-    ticket: ticket,
-    resistencia: resistencia,
-    volumen: volumen,
-    unidad: unidad
-};
-
-console.log('datos length =' + datos.length);
-const tabla = 'despachohs'
-
-ipcRenderer.send('guardar', datos, tabla);
-form.reset()
-};
+        ipcRenderer.send('guardar', datos, tabla);
+        //form.reset()
+        location.reload();
+    };
 
 
 </script>
